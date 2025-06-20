@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Financiera Gamer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body data-theme="purple">
+    <div id="particles-js"></div>
+    <div id="button-particles" class="button-particles"></div>
+    <audio id="clickSound" src="sounds/ClickSound.mp3" preload="auto"></audio>
+    <audio id="calculateSound" src="sounds/NotificationSound.mp3" preload="auto"></audio>
+    <audio id="themeSound" src="sounds/ThemeSound.mp3" preload="auto"></audio>
+
+    <div class="container">
+        <h1 class="glitch" data-text="💰 Calculadora Financiera Gamer 💰">💰 Calculadora Financiera Gamer 💰</h1>
+        <div class="theme-selector">
+            <label for="theme">Tema:</label>
+            <select id="theme">
+                <option value="purple">Morado Neón</option>
+                <option value="green">Verde Neón</option>
+                <option value="blue">Azul Neón</option>
+            </select>
+        </div>
+        <div class="calculator">
+            <form id="calcForm">
+                <div class="form-group">
+                    <label for="currency">Moneda:</label>
+                    <select id="currency">
+                        <option value="USD">USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                        <option value="MXN">MXN ($)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="amount">Monto Principal:</label>
+                    <input type="number" id="amount" placeholder="Ej: 1000" required>
+                </div>
+                <div class="form-group">
+                    <label for="rate">Tasa de Interés (% anual):</label>
+                    <input type="number" id="rate" placeholder="5" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="time">Tiempo (años):</label>
+                    <input type="number" id="time" placeholder="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="cashFlows">Flujos de Caja (separados por comas):</label>
+                    <input type="text" id="cashFlows" placeholder="Ej: -1000, 500, 600">
+                </div>
+                <div class="form-group sensitivity-group" style="display: none;">
+                    <label for="rateRange">Rango de Tasas para Sensibilidad (%):</label>
+                    <input type="text" id="rateRange" placeholder="Ej: 2,8">
+                </div>
+                <div class="input-group">
+                    <label for="calcType">Tipo de Cálculo:</label>
+                    <select id="calcType">
+                        <option value="simple">Interés Simple</option>
+                        <option value="compound">Interés Compuesto</option>
+                        <option value="amortization">Amortización</option>
+                        <option value="npv">VAN (Valor Actual Neto)</option>
+                        <option value="irr">TIR (Tasa Interna de Retorno)</option>
+                        <option value="sensitivity">Análisis de Sensibilidad</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-calculate">Calcular</button>
+            </form>
+            <div id="result" class="result"></div>
+            <div id="amortizationTable" class="amortization-table"></div>
+            <canvas id="chartCanvas" width="400" height="200"></canvas>
+            <div class="export-buttons">
+                <button id="downloadChartBtn" class="btn btn-secondary" disabled>Descargar Gráfico</button>
+                <button id="exportPdfBtn" class="btn btn-secondary" disabled>Exportar PDF</button>
+            </div>
+            <div class="history">
+                <h2>Historial de Cálculos</h2>
+                <ul id="historyList"></ul>
+                <button id="clearHistory" class="btn btn-clear">Limpiar Historial</button>
+                <button id="downloadHistory" class="btn-clear">Descargar Historial (CSV)</button>
+            </div>
+        </div>
+    </div>
+    <div id="tutorialModal" class="tutorial-modal">
+        <div class="tutorial-content">
+            <h2 class="glitch" data-text="Tutorial Interactivo">Tutorial Interactivo</h2>
+            <p id="tutorialText"></p>
+            <button id="prevStep" class="btn btn-secondary">Anterior</button>
+            <button id="nextStep" class="btn btn-secondary">Siguiente</button>
+            <button id="closeTutorial" class="btn btn-clear">Cerrar</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
