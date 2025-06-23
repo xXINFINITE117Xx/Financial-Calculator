@@ -10,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.8.0/countUp.umd.min.js"></script>
 </head>
 
 <body data-theme="purple">
@@ -23,17 +24,17 @@
         <h1 class="glitch" data-text="💰 Calculadora Financiera Gamer 💰">💰 Calculadora Financiera Gamer 💰</h1>
         <div class="theme-selector">
             <label for="theme">Tema:</label>
-            <select id="theme">
+            <select id="theme" aria-label="Seleccionar tema de color">
                 <option value="purple">Morado Neón</option>
                 <option value="green">Verde Neón</option>
                 <option value="blue">Azul Neón</option>
             </select>
         </div>
         <div class="calculator">
-            <form id="calcForm">
+            <form id="calcForm" aria-label="Formulario de cálculos financieros">
                 <div class="form-group">
                     <label for="currency">Moneda:</label>
-                    <select id="currency">
+                    <select id="currency" aria-label="Seleccionar moneda">
                         <option value="USD">USD ($)</option>
                         <option value="EUR">EUR (€)</option>
                         <option value="MXN">MXN ($)</option>
@@ -41,27 +42,33 @@
                 </div>
                 <div class="form-group">
                     <label for="amount">Monto Principal:</label>
-                    <input type="number" id="amount" placeholder="Ej: 1000" required>
+                    <input type="number" id="amount" placeholder="Ej: 1000" required aria-describedby="amount-error">
+                    <span id="amount-error" class="error-tooltip"></span>
                 </div>
                 <div class="form-group">
                     <label for="rate">Tasa de Interés (% anual):</label>
-                    <input type="number" id="rate" placeholder="5" step="0.01" required>
+                    <input type="number" id="rate" placeholder="5" step="0.01" required aria-describedby="rate-error">
+                    <span id="rate-error" class="error-tooltip"></span>
                 </div>
                 <div class="form-group">
                     <label for="time">Tiempo (años):</label>
-                    <input type="number" id="time" placeholder="0" required>
+                    <input type="number" id="time" placeholder="0" required aria-describedby="time-error">
+                    <span id="time-error" class="error-tooltip"></span>
                 </div>
                 <div class="form-group">
                     <label for="cashFlows">Flujos de Caja (separados por comas):</label>
-                    <input type="text" id="cashFlows" placeholder="Ej: -1000, 500, 600">
+                    <input type="text" id="cashFlows" placeholder="Ej: -1000, 500, 600"
+                        aria-describedby="cashFlows-error">
+                    <span id="cashFlows-error" class="error-tooltip"></span>
                 </div>
                 <div class="form-group sensitivity-group" style="display: none;">
                     <label for="rateRange">Rango de Tasas para Sensibilidad (%):</label>
-                    <input type="text" id="rateRange" placeholder="Ej: 2,8">
+                    <input type="text" id="rateRange" placeholder="Ej: 2,8" aria-describedby="rateRange-error">
+                    <span id="rateRange-error" class="error-tooltip"></span>
                 </div>
                 <div class="input-group">
                     <label for="calcType">Tipo de Cálculo:</label>
-                    <select id="calcType">
+                    <select id="calcType" aria-label="Seleccionar tipo de cálculo">
                         <option value="simple">Interés Simple</option>
                         <option value="compound">Interés Compuesto</option>
                         <option value="amortization">Amortización</option>
@@ -72,25 +79,25 @@
                 </div>
                 <button type="submit" class="btn-calculate">Calcular</button>
             </form>
-            <div id="result" class="result"></div>
+            <div id="result" class="result" aria-live="polite"></div>
             <div id="amortizationTable" class="amortization-table"></div>
-            <canvas id="chartCanvas" width="400" height="200"></canvas>
+            <canvas id="chartCanvas" width="400" height="200" aria-label="Gráfico de resultados financieros"></canvas>
             <div class="export-buttons">
                 <button id="downloadChartBtn" class="btn btn-secondary" disabled>Descargar Gráfico</button>
                 <button id="exportPdfBtn" class="btn btn-secondary" disabled>Exportar PDF</button>
             </div>
             <div class="history">
                 <h2>Historial de Cálculos</h2>
-                <ul id="historyList"></ul>
+                <ul id="historyList" aria-label="Lista de cálculos previos"></ul>
                 <button id="clearHistory" class="btn btn-clear">Limpiar Historial</button>
-                <button id="downloadHistory" class="btn-clear">Descargar Historial (CSV)</button>
+                <button id="downloadHistory" class="btn btn-clear">Descargar Historial (CSV)</button>
             </div>
         </div>
     </div>
     <div id="tutorialModal" class="tutorial-modal">
         <div class="tutorial-content">
             <h2 class="glitch" data-text="Tutorial Interactivo">Tutorial Interactivo</h2>
-            <p id="tutorialText"></p>
+            <p id="tutorialText" aria-live="polite"></p>
             <button id="prevStep" class="btn btn-secondary">Anterior</button>
             <button id="nextStep" class="btn btn-secondary">Siguiente</button>
             <button id="closeTutorial" class="btn btn-clear">Cerrar</button>

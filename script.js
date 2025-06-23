@@ -59,6 +59,54 @@ function formatCurrency(amount, currency) {
   return `${symbols[currency] || "$"}${amount}`;
 }
 
+/* Validate input in real-time */
+function validateInput(input, errorElement, validationFn, errorMessage) {
+  if (!input || !errorElement) return;
+  const value = input.value.trim();
+  const isValid = validationFn(value);
+  input.classList.toggle("invalid", !isValid);
+  errorElement.classList.toggle("show", !isValid);
+  errorElement.textContent = isValid ? "" : errorMessage;
+  input.setAttribute("aria-invalid", !isValid);
+}
+
+/* Validation functions */
+const validations = {
+  amount: {
+    fn: (value) => !isNaN(parseFloat(value)) && parseFloat(value) > 0,
+    message: "Ingrese un monto positivo.",
+  },
+  rate: {
+    fn: (value) => !isNaN(parseFloat(value)) && parseFloat(value) >= 0,
+    message: "Ingrese una tasa no negativa.",
+  },
+  time: {
+    fn: (value) => !isNaN(parseFloat(value)) && parseFloat(value) > 0,
+    message: "Ingrese un tiempo positivo.",
+  },
+  cashFlows: {
+    fn: (value) => {
+      if (!value) return true; // Optional
+      const flows = value.split(",").map((v) => parseFloat(v.trim()));
+      return flows.every((v) => !isNaN(v));
+    },
+    message: "Ingrese números separados por comas.",
+  },
+  rateRange: {
+    fn: (value) => {
+      if (!value) return true; // Optional
+      const range = value.split(",").map((v) => parseFloat(v.trim()));
+      return (
+        range.length === 2 &&
+        !isNaN(range[0]) &&
+        !isNaN(range[1]) &&
+        range[0] < range[1]
+      );
+    },
+    message: "Ingrese un rango válido (ej: 2,8).",
+  },
+};
+
 /* Validate cash flows */
 function validateCashFlows(cashFlows) {
   return (
@@ -255,8 +303,12 @@ const tutorialSteps = [
     highlight: "#currency",
   },
   {
-    text: "Ingresa el monto principal, tasa de interés y tiempo.",
-    highlight: "#amount, #rate, #time",
+    text: "Ingresa el monto principal. Verás alertas si es inválido.",
+    highlight: "#amount",
+  },
+  {
+    text: "Ingresa la tasa de interés y tiempo. Los errores se muestran en rojo.",
+    highlight: "#rate, #time",
   },
   {
     text: "Para VAN o TIR, ingresa flujos de caja separados por comas.",
@@ -314,6 +366,37 @@ function showTutorialStep(step) {
 /* Initialize history and exchange rates */
 updateHistoryList();
 fetchExchangeRates();
+
+/* Setup input validations */
+function setupInputValidations() {
+  const inputs = [
+    { id: "amount", errorId: "amount-error", validation: validations.amount },
+    { id: "rate", errorId: "rate-error", validation: validations.rate },
+    { id: "time", errorId: "time-error", validation: validations.time },
+    {
+      id: "cashFlows",
+      errorId: "cashFlows-error",
+      validation: validations.cashFlows,
+    },
+    {
+      id: "rateRange",
+      errorId: "rateRange-error",
+      validation: validations.rateRange,
+    },
+  ];
+
+  inputs.forEach(({ id, errorId, validation }) => {
+    const input = document.getElementById(id);
+    const errorElement = document.getElementById(errorId);
+    if (input && errorElement) {
+      input.addEventListener("input", () => {
+        validateInput(input, errorElement, validation.fn, validation.message);
+      });
+      // Initial validation
+      validateInput(input, errorElement, validation.fn, validation.message);
+    }
+  });
+}
 
 /* Clear history */
 const clearHistoryBtn = document.getElementById("clearHistory");
@@ -504,7 +587,7 @@ if (calcForm) {
     const calcType = calcTypeSelect.value;
 
     let resultText = "";
-    chartData = null; // Reset chartData
+    chartData = null;
 
     /* Play calculate sound */
     const calculateSound = document.getElementById("calculateSound");
@@ -576,13 +659,19 @@ if (calcForm) {
         /* Simple Interest */
         const interest = amount * rate * time;
         const total = amount + interest;
-        resultText = `Interés Simple:<br>Interés: ${formatCurrency(
+        resultText = `Interés Simple:<br>Interés: <span class="count-up" data-value="${convertToCurrency(
+          interest,
+          currency
+        )}">${formatCurrency(
           convertToCurrency(interest, currency),
           currency
-        )}<br>Total: ${formatCurrency(
+        )}</span><br>Total: <span class="count-up" data-value="${convertToCurrency(
+          total,
+          currency
+        )}">${formatCurrency(
           convertToCurrency(total, currency),
           currency
-        )}`;
+        )}</span>`;
         chartData = {
           labels: ["Monto Principal", "Interés"],
           datasets: [
@@ -609,13 +698,19 @@ if (calcForm) {
         /* Compound Interest */
         const total = amount * Math.pow(1 + rate, time);
         const interest = total - amount;
-        resultText = `Interés Compuesto:<br>Interés: ${formatCurrency(
+        resultText = `Interés Compuesto:<br>Interés: <span class="count-up" data-value="${convertToCurrency(
+          interest,
+          currency
+        )}">${formatCurrency(
           convertToCurrency(interest, currency),
           currency
-        )}<br>Total: ${formatCurrency(
+        )}</span><br>Total: <span class="count-up" data-value="${convertToCurrency(
+          total,
+          currency
+        )}">${formatCurrency(
           convertToCurrency(total, currency),
           currency
-        )}`;
+        )}</span>`;
         chartData = {
           labels: ["Monto Principal", "Interés"],
           datasets: [
@@ -649,13 +744,19 @@ if (calcForm) {
           resultText =
             "Error en el cálculo de amortización. Verifique los valores.";
         } else {
-          resultText = `Amortización:<br>Cuota Mensual: ${formatCurrency(
+          resultText = `Amortización:<br>Cuota Mensual: <span class="count-up" data-value="${convertToCurrency(
+            monthlyPayment,
+            currency
+          )}">${formatCurrency(
             convertToCurrency(monthlyPayment, currency),
             currency
-          )}<br>Total Pagado: ${formatCurrency(
+          )}</span><br>Total Pagado: <span class="count-up" data-value="${convertToCurrency(
+            monthlyPayment * months,
+            currency
+          )}">${formatCurrency(
             convertToCurrency(monthlyPayment * months, currency),
             currency
-          )}`;
+          )}</span>`;
           chartData = {
             labels: Array.from({ length: months }, (_, i) => `Mes ${i + 1}`),
             datasets: [
@@ -679,7 +780,6 @@ if (calcForm) {
               currency
             )}`
           );
-          /* Generate amortization table */
           amortizationTableDiv.innerHTML = generateAmortizationTable(
             amount,
             monthlyRate,
@@ -691,10 +791,13 @@ if (calcForm) {
       } else if (calcType === "npv") {
         /* NPV */
         const npv = calculateNPV(rate, cashFlows);
-        resultText = `VAN (Valor Actual Neto): ${formatCurrency(
+        resultText = `VAN (Valor Actual Neto): <span class="count-up" data-value="${convertToCurrency(
+          npv,
+          currency
+        )}">${formatCurrency(
           convertToCurrency(npv, currency),
           currency
-        )}`;
+        )}</span>`;
         chartData = {
           labels: cashFlows.map((_, i) => `Período ${i}`),
           datasets: [
@@ -725,7 +828,9 @@ if (calcForm) {
           resultText =
             "No se pudo calcular la TIR. Asegúrese de incluir al menos un flujo negativo y uno positivo.";
         } else {
-          resultText = `TIR (Tasa Interna de Retorno): ${irr.toFixed(2)}%`;
+          resultText = `TIR (Tasa Interna de Retorno): <span class="count-up" data-value="${irr.toFixed(
+            2
+          )}">${irr.toFixed(2)}%</span>`;
           chartData = {
             labels: cashFlows.map((_, i) => `Período ${i}`),
             datasets: [
@@ -755,8 +860,15 @@ if (calcForm) {
         resultText = `Análisis de Sensibilidad (VAN):<br>Tasas: [${rates.join(
           ", "
         )}]%<br>VANs: [${npvs
-          .map((npv) =>
-            formatCurrency(convertToCurrency(npv, currency), currency)
+          .map(
+            (npv) =>
+              `<span class="count-up" data-value="${convertToCurrency(
+                npv,
+                currency
+              )}">${formatCurrency(
+                convertToCurrency(npv, currency),
+                currency
+              )}</span>`
           )
           .join(", ")}]`;
         chartData = {
@@ -791,11 +903,27 @@ if (calcForm) {
       localStorage.setItem("calcHistory", JSON.stringify(history));
       updateHistoryList();
 
-      /* Show result */
+      /* Show result with animation */
       resultDiv.innerHTML = resultText;
       resultDiv.style.opacity = "0";
       setTimeout(() => {
         resultDiv.style.opacity = "1";
+        // Animate count-up values
+        document.querySelectorAll(".count-up").forEach((span) => {
+          const value = parseFloat(span.getAttribute("data-value"));
+          const countUp = new CountUp(span, value, {
+            duration: 2,
+            separator: "",
+            decimalPlaces: 2,
+            prefix: formatCurrency("", currency),
+            useEasing: true,
+          });
+          if (!countUp.error) {
+            countUp.start();
+          } else {
+            console.error(countUp.error);
+          }
+        });
       }, 100);
 
       /* Destroy previous chart */
@@ -817,19 +945,48 @@ if (calcForm) {
             data: chartData,
             options: {
               responsive: true,
+              interaction: {
+                mode: "index",
+                intersect: false,
+              },
+              plugins: {
+                tooltip: {
+                  enabled: true,
+                  callbacks: {
+                    label: (context) =>
+                      `${context.dataset.label}: ${formatCurrency(
+                        convertToCurrency(context.raw, currency),
+                        currency
+                      )}`,
+                  },
+                },
+                legend: { labels: { color: "#fff" } },
+                zoom: {
+                  zoom: {
+                    wheel: { enabled: true },
+                    pinch: { enabled: true },
+                    mode: "xy",
+                  },
+                  pan: { enabled: true, mode: "xy" },
+                },
+              },
               scales: {
                 y: {
                   beginAtZero: true,
                   grid: { borderColor: "#ff00ff" },
-                  ticks: { color: "#fff" },
+                  ticks: {
+                    color: "#fff",
+                    callback: (value) =>
+                      formatCurrency(
+                        convertToCurrency(value, currency),
+                        currency
+                      ),
+                  },
                 },
                 x: {
                   grid: { borderColor: "#ff00ff" },
                   ticks: { color: "#fff" },
                 },
-              },
-              plugins: {
-                legend: { labels: { color: "#fff" } },
               },
             },
           });
@@ -862,3 +1019,6 @@ if (calcForm) {
 } else {
   console.error("calcForm not found");
 }
+
+/* Initialize validations */
+setupInputValidations();
