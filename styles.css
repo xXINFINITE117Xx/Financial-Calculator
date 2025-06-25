@@ -1,876 +1,270 @@
-/* Temas */
-body[data-theme="purple"] {
-    --primary-neon: #ff00ff;
-    --secondary-neon: #00ccff;
-    --background-gradient: linear-gradient(135deg, #0d0d2b 0%, #1a1a4e 100%);
-    --error-neon: #ff4444;
-}
-
-body[data-theme="green"] {
-    --primary-neon: #00ff00;
-    --secondary-neon: #00ccff;
-    --background-gradient: linear-gradient(135deg, #0d2b0d 0%, #1a4e1a 100%);
-    --error-neon: #ff4444;
-}
-
-body[data-theme="blue"] {
-    --primary-neon: #00ccff;
-    --secondary-neon: #ff00ff;
-    --background-gradient: linear-gradient(135deg, #0d2b2b 0%, #1a4e4e 100%);
-    --error-neon: #ff4444;
+@font-face {
+    font-family: 'Orbitron';
+    src: url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    background: var(--background-gradient);
     font-family: 'Orbitron', sans-serif;
-    color: #fff;
-    overflow-y: auto;
+    background: linear-gradient(135deg, #1a202c, #2d3748);
 }
 
-#particles-js {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
+.glow {
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.7), 0 0 20px rgba(34, 197, 94, 0.5);
+    transition: box-shadow 0.3s ease;
 }
 
-#button-particles {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.5s ease;
+.glow:hover {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 1), 0 0 30px rgba(34, 197, 94, 0.7);
 }
 
-#button-particles.active {
-    opacity: 1;
+.text-gold {
+    color: #f1c40f;
 }
 
-.container {
-    background: rgba(0, 0, 0, 0.8);
-    padding: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 0 20px var(--secondary-neon), 0 0 40px var(--primary-neon);
-    text-align: center;
-    animation: glow 2s ease-in-out infinite alternate;
-    position: relative;
-    z-index: 1;
-    max-width: 600px;
-    width: 90%;
-    margin: 1rem auto;
-}
-
-h1.glitch {
-    font-size: 2.5rem;
-    text-shadow: 0 0 10px var(--secondary-neon), 0 0 20px var(--primary-neon);
-    margin-bottom: 1.5rem;
-    position: relative;
-    animation: glitch 1s linear infinite;
-}
-
-h1.glitch::before,
-h1.glitch::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-h1.glitch::before {
-    color: var(--primary-neon);
-    animation: glitch-top 1s linear infinite;
-    clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
-}
-
-h1.glitch::after {
-    color: var(--secondary-neon);
-    animation: glitch-bottom 1.5s linear infinite;
-    clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
-}
-
-.theme-selector {
-    margin-bottom: 1.5rem;
-    text-align: left;
-}
-
-.theme-selector label {
-    font-size: 1.2rem;
-    color: var(--secondary-neon);
-    text-shadow: 0 0 5px var(--secondary-neon);
-}
-
-.theme-selector select {
-    width: 100%;
-    padding: 0.8rem;
-    border: 2px solid var(--primary-neon);
-    border-radius: 8px;
-    background: #1a1a4e;
-    color: #fff;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
-
-.theme-selector select:focus {
-    outline: none;
-    border-color: var(--secondary-neon);
-    box-shadow: 0 0 10px var(--secondary-neon);
-}
-
-.calculator {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-    text-align: left;
-    position: relative;
-}
-
-label {
-    font-size: 1.2rem;
-    color: var(--secondary-neon);
-    text-shadow: 0 0 5px var(--secondary-neon);
-}
-
-input,
-select {
-    width: 100%;
-    padding: 0.8rem;
-    border: 2px solid var(--primary-neon);
-    border-radius: 8px;
-    background: #1a1a4e;
-    color: #fff;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
-
-input:focus,
-select:focus {
-    outline: none;
-    border-color: var(--secondary-neon);
-    box-shadow: 0 0 10px var(--secondary-neon);
-}
-
-input.invalid {
-    border-color: var(--error-neon);
-    box-shadow: 0 0 10px var(--error-neon);
-}
-
-.error-tooltip {
-    display: none;
-    position: absolute;
-    bottom: -2rem;
-    left: 0;
-    background: rgba(0, 0, 0, 0.9);
-    color: var(--error-neon);
-    padding: 0.5rem;
-    border-radius: 5px;
-    border: 1px solid var(--error-neon);
-    font-size: 0.9rem;
-    z-index: 10;
-    animation: fadeInTooltip 0.3s ease;
-}
-
-.error-tooltip.show {
-    display: block;
-}
-
-.btn-calculate,
-.btn-clear,
-.btn-secondary {
-    width: 100%;
-    padding: 1rem;
-    background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon));
-    border: none;
-    border-radius: 8px;
-    color: #fff;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    margin-top: 1rem;
-    position: relative;
-    z-index: 1;
-}
-
-.btn-secondary {
-    background: linear-gradient(45deg, var(--secondary-neon), var(--primary-neon));
-    font-size: 1rem;
-}
-
-.btn-calculate:hover,
-.btn-clear:hover,
-.btn-secondary:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 15px var(--primary-neon), 0 0 30px var(--secondary-neon);
-}
-
-.btn-secondary:disabled {
-    background: linear-gradient(45deg, #666, #999);
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-.result {
-    margin-top: 2rem;
-    padding: 1rem;
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 8px;
-    border: 2px solid var(--secondary-neon);
-    color: #fff;
-    font-size: 1.1rem;
-    text-shadow: 0 0 5px var(--secondary-neon);
-    opacity: 0;
-    animation: fadeIn 0.5s ease forwards;
-}
-
-.result .count-up {
-    display: inline-block;
-    color: var(--primary-neon);
-}
-
-.amortization-table {
-    margin-top: 1rem;
-    padding: 1rem;
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 8px;
-    border: 2px solid var(--secondary-neon);
-    color: #fff;
-    font-size: 0.9rem;
-    overflow-x: auto;
-}
-
-.amortization-table table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.amortization-table th,
-.amortization-table td {
-    padding: 0.5rem;
-    border: 1px solid var(--primary-neon);
+table th,
+table td {
+    border: 1px solid #22c55e;
+    padding: 8px;
     text-align: right;
 }
 
-.amortization-table th {
-    background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon));
-    color: #fff;
-    text-shadow: 0 0 5px #000;
+table th {
+    background: #22c55e;
 }
 
-.amortization-table td {
-    color: var(--secondary-neon);
+/* Tailwind CSS compilado (subset de clases usadas) */
+.bg-gray-900 {
+    background-color: #111827;
 }
 
-.history {
-    margin-top: 2rem;
+.text-white {
+    color: #ffffff;
+}
+
+.font-sans {
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.md\:flex-row {
+    @media (min-width: 768px) {
+        flex-direction: row;
+    }
+}
+
+.gap-6 {
+    gap: 1.5rem;
+}
+
+.p-4 {
     padding: 1rem;
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 8px;
-    border: 2px solid var(--secondary-neon);
 }
 
-.history h2 {
+.min-h-screen {
+    min-height: 100vh;
+}
+
+.bg-gray-800 {
+    background-color: #1f2937;
+}
+
+.p-6 {
+    padding: 1.5rem;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem;
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-green-500\/50 {
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
+
+.text-2xl {
     font-size: 1.5rem;
-    color: var(--secondary-neon);
-    text-shadow: 0 0 5px var(--secondary-neon);
-    margin-bottom: 1rem;
+    line-height: 2rem;
 }
 
-#historyList {
-    list-style: none;
-    padding: 0;
-    max-height: 200px;
-    overflow-y: auto;
+.font-bold {
+    font-weight: 700;
 }
 
-#historyList li {
-    padding: 0.5rem;
-    border-bottom: 1px solid var(--primary-neon);
-    color: #fff;
-    font-size: 1rem;
+.text-green-400 {
+    color: #4ade80;
 }
 
-.export-buttons {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-    justify-content: center;
-}
-
-.tutorial-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-}
-
-.tutorial-modal.show {
-    display: flex;
-}
-
-.tutorial-content {
-    background: rgba(0, 0, 0, 0.8);
-    padding: 2rem;
-    border-radius: 15px;
-    border: 2px solid var(--secondary-neon);
-    box-shadow: 0 0 20px var(--primary-neon);
-    max-width: 500px;
-    width: 90%;
-    text-align: center;
-}
-
-.tutorial-content h2 {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-}
-
-.tutorial-content p {
-    font-size: 1rem;
-    color: var(--secondary-neon);
+.mb-6 {
     margin-bottom: 1.5rem;
 }
 
-.tutorial-content button {
-    margin: 0.5rem;
+.text-center {
+    text-align: center;
 }
 
-/* Media Queries para 352-480px (Móviles pequeños) */
-@media (min-width: 352px) and (max-width: 480px) {
-    body {
-        align-items: flex-start;
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
-    }
+.w-full {
+    width: 100%;
+}
 
+.py-3 {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.bg-green-600 {
+    background-color: #16a34a;
+}
+
+.hover\:bg-green-700:hover {
+    background-color: #15803d;
+}
+
+.text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+.transition-all {
+    transition-property: all;
+}
+
+.duration-300 {
+    transition-duration: 300ms;
+}
+
+.flex-1 {
+    flex: 1 1 0%;
+}
+
+.hidden {
+    display: none;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.block {
+    display: block;
+}
+
+.p-2 {
+    padding: 0.5rem;
+}
+
+.bg-gray-700 {
+    background-color: #374151;
+}
+
+.border {
+    border-width: 1px;
+}
+
+.border-green-500 {
+    border-color: #22c55e;
+}
+
+.py-2 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.mt-4 {
+    margin-top: 1rem;
+}
+
+.bg-red-600 {
+    background-color: #dc3545;
+}
+
+.bg-gold {
+    background-color: #f1c40f;
+}
+
+.hover:bg-yellow-600:hover {
+    background-color: #d97706;
+}
+
+.border-collapse {
+    border-collapse: collapse;
+}
+
+@media (min-width: 200px) {
     .container {
-        padding: 1rem;
-        width: 95%;
-        margin: 0.5rem auto;
-        min-height: auto;
+        padding: 12px;
     }
 
-    h1.glitch {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
+    .sidebar {
+        width: 100%;
+        max-width: 320px;
     }
 
-    .theme-selector label {
-        font-size: 1rem;
+    .content {
+        padding: 12px;
     }
 
-    .theme-selector select {
-        padding: 0.6rem;
-        font-size: 0.9rem;
+    .form-group input {
+        font-size: 14px;
     }
 
-    .calculator {
-        max-width: 100%;
-    }
-
-    .form-group {
-        margin-bottom: 1rem;
-    }
-
-    .form-group label {
-        font-size: 1rem;
-    }
-
-    input,
-    select {
-        padding: 0.6rem;
-        font-size: 0.9rem;
-    }
-
-    .error-tooltip {
-        font-size: 0.8rem;
-        bottom: -1.8rem;
-    }
-
-    .btn-calculate,
-    .btn-clear,
-    .btn-secondary {
-        font-size: 1rem;
-        padding: 0.8rem;
-        margin-top: 0.8rem;
-    }
-
-    .export-buttons {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .result,
-    .amortization-table,
-    .history {
-        font-size: 0.8rem;
-        padding: 0.8rem;
-        margin-top: 1rem;
-    }
-
-    .amortization-table th,
-    .amortization-table td {
-        padding: 0.3rem;
-        font-size: 0.7rem;
-    }
-
-    .history h2 {
-        font-size: 1.2rem;
-    }
-
-    #chartCanvas {
-        height: 150px;
-        margin-top: 1rem;
-    }
-
-    #historyList {
-        max-height: 150px;
-    }
-
-    .tutorial-content {
-        padding: 1rem;
-        max-width: 90%;
-    }
-
-    .tutorial-content h2 {
-        font-size: 1.4rem;
-    }
-
-    .tutorial-content p {
-        font-size: 0.8rem;
-    }
-
-    .tutorial-content button {
-        font-size: 0.9rem;
-        padding: 0.6rem;
+    button {
+        font-size: 14px;
     }
 }
 
-/* Media Queries para 481-768px (Móviles grandes y tablets pequeñas) */
-@media (min-width: 481px) and (max-width: 768px) {
-    body {
-        align-items: flex-start;
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-    }
-
+@media (min-width: 600px) {
     .container {
-        padding: 1.5rem;
-        width: 90%;
-        margin: 1rem auto;
-        min-height: auto;
-    }
-
-    h1.glitch {
-        font-size: 1.8rem;
-        margin-bottom: 1.2rem;
-    }
-
-    .theme-selector label {
-        font-size: 1.1rem;
-    }
-
-    .theme-selector select {
-        padding: 0.7rem;
-        font-size: 1rem;
-    }
-
-    .calculator {
-        max-width: 100%;
-    }
-
-    .form-group {
-        margin-bottom: 1.2rem;
-    }
-
-    .form-group label {
-        font-size: 1.1rem;
-    }
-
-    input,
-    select {
-        padding: 0.7rem;
-        font-size: 1rem;
-    }
-
-    .error-tooltip {
-        font-size: 0.8rem;
-        bottom: -1.8rem;
-    }
-
-    .btn-calculate,
-    .btn-clear,
-    .btn-secondary {
-        font-size: 1.1rem;
-        padding: 0.9rem;
-        margin-top: 1rem;
-    }
-
-    .export-buttons {
         flex-direction: row;
-        gap: 0.8rem;
-    }
-
-    .result,
-    .amortization-table,
-    .history {
-        font-size: 0.9rem;
-        padding: 1rem;
-        margin-top: 1.2rem;
-    }
-
-    .amortization-table th,
-    .amortization-table td {
-        padding: 0.4rem;
-        font-size: 0.8rem;
-    }
-
-    .history h2 {
-        font-size: 1.3rem;
-    }
-
-    #chartCanvas {
-        height: 180px;
-        margin-top: 1.2rem;
-    }
-
-    #historyList {
-        max-height: 180px;
-    }
-
-    .tutorial-content {
-        padding: 1.5rem;
-        max-width: 80%;
-    }
-
-    .tutorial-content h2 {
-        font-size: 1.6rem;
-    }
-
-    .tutorial-content p {
-        font-size: 0.9rem;
-    }
-
-    .tutorial-content button {
-        font-size: 1rem;
-        padding: 0.8rem;
-    }
-}
-
-/* Media Queries para 769-920px (Tablets medianas) */
-@media (min-width: 769px) and (max-width: 920px) {
-    .container {
-        padding: 1.8rem;
-        width: 85%;
-        max-width: 700px;
-        margin: 1.5rem auto;
-    }
-
-    h1.glitch {
-        font-size: 2rem;
-    }
-
-    .theme-selector label {
-        font-size: 1.2rem;
-    }
-
-    .theme-selector select {
-        padding: 0.8rem;
-        font-size: 1.1rem;
-    }
-
-    .calculator {
-        max-width: 600px;
-    }
-
-    .form-group label {
-        font-size: 1.2rem;
-    }
-
-    input,
-    select {
-        padding: 0.8rem;
-        font-size: 1.1rem;
-    }
-
-    .error-tooltip {
-        font-size: 0.9rem;
-    }
-
-    .btn-calculate,
-    .btn-clear,
-    .btn-secondary {
-        font-size: 1.2rem;
-        padding: 1rem;
-    }
-
-    .result,
-    .amortization-table,
-    .history {
-        font-size: 1rem;
-        padding: 1.2rem;
-    }
-
-    .amortization-table th,
-    .amortization-table td {
-        padding: 0.5rem;
-        font-size: 0.9rem;
-    }
-
-    .history h2 {
-        font-size: 1.4rem;
-    }
-
-    #chartCanvas {
-        height: 200px;
-    }
-}
-
-/* Media Queries para 921-1279px (Laptops pequeñas y tablets grandes) */
-@media (min-width: 921px) and (max-width: 1279px) {
-    .container {
-        padding: 2rem;
-        width: 80%;
-        max-width: 900px;
-        margin: 2rem auto;
-    }
-
-    h1.glitch {
-        font-size: 2.2rem;
-    }
-
-    .theme-selector label {
-        font-size: 1.3rem;
-    }
-
-    .theme-selector select {
-        padding: 0.9rem;
-        font-size: 1.2rem;
-    }
-
-    .calculator {
-        max-width: 700px;
-    }
-
-    .form-group label {
-        font-size: 1.3rem;
-    }
-
-    input,
-    select {
-        padding: 0.9rem;
-        font-size: 1.2rem;
-    }
-
-    .error-tooltip {
-        font-size: 0.9rem;
-    }
-
-    .btn-calculate,
-    .btn-clear,
-    .btn-secondary {
-        font-size: 1.3rem;
-        padding: 1.1rem;
-    }
-
-    .result,
-    .amortization-table,
-    .history {
-        font-size: 1.1rem;
-        padding: 1.3rem;
-    }
-
-    .amortization-table th,
-    .amortization-table td {
-        padding: 0.6rem;
-        font-size: 1rem;
-    }
-
-    .history h2 {
-        font-size: 1.5rem;
-    }
-
-    #chartCanvas {
-        height: 220px;
-    }
-}
-
-/* Media Queries para 1280px+ (Escritorios) */
-@media (min-width: 1280px) {
-    .container {
-        padding: 2.5rem;
-        width: 75%;
         max-width: 1000px;
-        margin: 2.5rem auto;
     }
 
-    h1.glitch {
-        font-size: 2.5rem;
+    .sidebar {
+        width: 250px;
     }
 
-    .theme-selector label {
-        font-size: 1.4rem;
-    }
-
-    .theme-selector select {
-        padding: 1rem;
-        font-size: 1.3rem;
-    }
-
-    .calculator {
+    .content {
         max-width: 800px;
     }
 
-    .form-group label {
-        font-size: 1.4rem;
+    .form-group input {
+        font-size: 16px;
     }
 
-    input,
-    select {
-        padding: 1rem;
-        font-size: 1.3rem;
-    }
-
-    .error-tooltip {
-        font-size: 1rem;
-    }
-
-    .btn-calculate,
-    .btn-clear,
-    .btn-secondary {
-        font-size: 1.4rem;
-        padding: 1.2rem;
-    }
-
-    .result,
-    .amortization-table,
-    .history {
-        font-size: 1.2rem;
-        padding: 1.5rem;
-    }
-
-    .amortization-table th,
-    .amortization-table td {
-        padding: 0.7rem;
-        font-size: 1.1rem;
-    }
-
-    .history h2 {
-        font-size: 1.6rem;
-    }
-
-    #chartCanvas {
-        height: 250px;
+    button {
+        font-size: 16px;
     }
 }
 
-/* Animaciones */
-@keyframes glow {
-    from {
-        box-shadow: 0 0 20px var(--secondary-neon), 0 0 40px var(--primary-neon);
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1200px;
     }
 
-    to {
-        box-shadow: 0 0 30px var(--secondary-neon), 0 0 60px var(--primary-neon);
-    }
-}
-
-@keyframes chartGlow {
-    from {
-        box-shadow: 0 0 10px var(--primary-neon);
-    }
-
-    to {
-        box-shadow: 0 0 20px var(--secondary-neon);
-    }
-}
-
-@keyframes fadeIn {
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes fadeInTooltip {
-    from {
-        opacity: 0;
-        transform: translateY(5px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes glitch {
-
-    2%,
-    64% {
-        transform: translate(2px, 0) skew(0deg);
-    }
-
-    4%,
-    60% {
-        transform: translate(-2px, 0) skew(0deg);
-    }
-
-    62% {
-        transform: translate(0, 0) skew(5deg);
-    }
-}
-
-@keyframes glitch-top {
-
-    2%,
-    64% {
-        transform: translate(2px, -2px);
-    }
-
-    4%,
-    60% {
-        transform: translate(-2px, 2px);
-    }
-
-    62% {
-        transform: translate(0, 0) skew(5deg);
-    }
-}
-
-@keyframes glitch-bottom {
-
-    2%,
-    64% {
-        transform: translate(-2px, 0);
-    }
-
-    4%,
-    60% {
-        transform: translate(2px, -0);
-    }
-
-    62% {
-        transform: translate(0, 0) skew(-5deg);
+    .sidebar {
+        width: 300px;
     }
 }
