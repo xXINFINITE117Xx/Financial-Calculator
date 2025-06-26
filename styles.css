@@ -131,6 +131,28 @@ button:hover {
     border-radius: 8px;
 }
 
+#loading-screen {
+    transition: opacity 0.5s ease;
+}
+
+#loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#tutorial-modal {
+    transition: opacity 0.3s ease;
+}
+
+#tutorial-modal.hidden {
+    display: none;
+}
+
+#tutorial-content p {
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
 @keyframes neon-flicker {
     0% {
         text-shadow: 0 0 5px #ffd700, 0 0 10px #00ff99;
