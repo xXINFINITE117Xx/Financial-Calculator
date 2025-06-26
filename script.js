@@ -76,16 +76,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const tutorialBtn = document.getElementById("tutorial-btn");
 
   const tutorialSteps = [
-    "<p><strong>Step 1: Overview</strong><br>Welcome to the Financial Calculator! Navigate using tabs, visualize results with bar charts, track calculations in the history modal, and export results as PDF or Excel.</p>",
-    "<p><strong>Step 2: Simple Interest</strong><br>Calculate interest with principal, rate, and time. View results in a bar chart and download as PDF.</p>",
-    "<p><strong>Step 3: Compound Interest</strong><br>See investment growth with compounding. The chart shows principal vs. total amount, with PDF export.</p>",
-    "<p><strong>Step 4: Loan Payment</strong><br>Calculate monthly loan payments. The chart breaks down principal, interest, and total paid, with PDF export.</p>",
-    "<p><strong>Step 5: Mortgage Calculator</strong><br>Plan your mortgage with affordability checks. The chart compares payment and max affordable payment, with PDF export.</p>",
-    "<p><strong>Step 6: Savings Goal</strong><br>Determine monthly savings needed. The chart shows current savings vs. goal, with PDF export.</p>",
-    "<p><strong>Step 7: Budget Planner</strong><br>Track expenses and savings with a pie chart for spending categories, with PDF export.</p>",
-    "<p><strong>Step 8: Investment Comparison</strong><br>Compare investment scenarios. The chart displays total amounts for each scenario, with PDF export.</p>",
-    "<p><strong>Step 9: Emergency Fund</strong><br>Calculate your emergency fund needs. The chart shows monthly expenses vs. fund needed, with PDF export.</p>",
-    "<p><strong>Step 10: History & Export</strong><br>View past calculations in the history modal and export to Excel or PDF. Enjoy interactive sounds and animations!</p>",
+    "<p><strong>Step 1: Overview</strong><br>Welcome to the Financial Calculator! Navigate using tabs, visualize results with bar charts, track calculations in the history modal, and export results as styled PDF or Excel.</p>",
+    "<p><strong>Step 2: Simple Interest</strong><br>Calculate interest with principal, rate, and time. View results in a bar chart and download as a styled PDF.</p>",
+    "<p><strong>Step 3: Compound Interest</strong><br>See investment growth with compounding. The chart shows principal vs. total amount, with styled PDF export.</p>",
+    "<p><strong>Step 4: Loan Payment</strong><br>Calculate monthly loan payments. The chart breaks down principal, interest, and total paid, with styled PDF export.</p>",
+    "<p><strong>Step 5: Mortgage Calculator</strong><br>Plan your mortgage with affordability checks. The chart compares payment and max affordable payment, with styled PDF export.</p>",
+    "<p><strong>Step 6: Savings Goal</strong><br>Determine monthly savings needed. The chart shows current savings vs. goal, with styled PDF export.</p>",
+    "<p><strong>Step 7: Budget Planner</strong><br>Track expenses and savings with a pie chart for spending categories, with styled PDF export.</p>",
+    "<p><strong>Step 8: Investment Comparison</strong><br>Compare investment scenarios. The chart displays total amounts for each scenario, with styled PDF export.</p>",
+    "<p><strong>Step 9: Emergency Fund</strong><br>Calculate your emergency fund needs. The chart shows monthly expenses vs. fund needed, with styled PDF export.</p>",
+    "<p><strong>Step 10: History & Export</strong><br>View past calculations in the history modal and export to styled Excel or PDF with modern formatting. Enjoy interactive sounds and animations!</p>",
   ];
 
   let currentStep = 0;
@@ -187,6 +187,44 @@ document.addEventListener("DOMContentLoaded", () => {
       ws_data.push([entry.type, entry.details, entry.timestamp]);
     });
     const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+    // Apply styles
+    const range = XLSX.utils.decode_range(ws["!ref"]);
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cell_address = { c: C, r: R };
+        const cell_ref = XLSX.utils.encode_cell(cell_address);
+        if (!ws[cell_ref]) continue;
+        ws[cell_ref].s = {
+          border: {
+            top: { style: "thin", color: { rgb: "000000" } },
+            bottom: { style: "thin", color: { rgb: "000000" } },
+            left: { style: "thin", color: { rgb: "000000" } },
+            right: { style: "thin", color: { rgb: "000000" } },
+          },
+          font: { name: "Calibri", sz: 11 },
+          fill: {
+            fgColor: {
+              rgb: R === 0 ? "00FF99" : R % 2 === 0 ? "F0F0F0" : "FFFFFF",
+            },
+          },
+          alignment: { vertical: "center", wrapText: true },
+        };
+        if (R === 0) {
+          ws[cell_ref].s.font.bold = true;
+          ws[cell_ref].s.fill.fgColor.rgb = "00FF99";
+          ws[cell_ref].s.font.color = { rgb: "FFFFFF" };
+        }
+      }
+    }
+
+    // Set column widths
+    ws["!cols"] = [
+      { wch: 20 }, // Type
+      { wch: 60 }, // Details
+      { wch: 25 }, // Timestamp
+    ];
+
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "History");
     const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
@@ -210,20 +248,45 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     const doc = new jsPDF();
-    doc.setFont("helvetica");
-    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.setTextColor(0, 255, 153); // Neon green
     doc.text("Financial Calculator History", 20, 20);
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(0, 255, 153);
+    doc.line(20, 22, 110, 22); // Underline
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
     let y = 30;
     history.forEach((entry, index) => {
-      doc.text(`Calculation ${index + 1}: ${entry.type}`, 20, y);
-      doc.text(`Details: ${entry.details}`, 20, y + 10);
-      doc.text(`Timestamp: ${entry.timestamp}`, 20, y + 20);
+      const bgColor = index % 2 === 0 ? [240, 240, 240] : [255, 255, 255];
+      doc.setFillColor(...bgColor);
+      doc.rect(20, y - 4, 170, 30, "F"); // Background rectangle
+      doc.setDrawColor(0, 0, 0);
+      doc.rect(20, y - 4, 170, 30); // Border
+      doc.text(`Calculation ${index + 1}: ${entry.type}`, 25, y);
+      const detailsLines = doc.splitTextToSize(
+        `Details: ${entry.details}`,
+        140
+      );
+      doc.text(detailsLines, 25, y + 10);
+      doc.text(`Timestamp: ${entry.timestamp}`, 25, y + 20);
       y += 40;
       if (y > 260) {
         doc.addPage();
         y = 20;
       }
     });
+    // Footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Page ${i} of ${pageCount}`, 180, 290);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 290);
+    }
     doc.save("financial_calculator_history.pdf");
     downloadSound.play();
   });
@@ -302,17 +365,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const downloadResultPDF = (type, details) => {
     const doc = new jsPDF();
-    doc.setFont("helvetica");
-    doc.setFontSize(12);
+    // Header
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.setTextColor(0, 255, 153); // Neon green
     doc.text(`Financial Calculator - ${type}`, 20, 20);
-    doc.text("Results:", 20, 30);
-    const lines = doc.splitTextToSize(details, 160);
-    doc.text(lines, 20, 40);
-    doc.text(
-      `Timestamp: ${new Date().toLocaleString()}`,
-      20,
-      lines.length * 10 + 50
-    );
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(0, 255, 153);
+    doc.line(20, 22, 110, 22); // Underline
+    // Content
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.setFillColor(240, 240, 240); // Light gray background
+    doc.rect(20, 30, 170, 40, "F"); // Background rectangle
+    doc.setDrawColor(0, 0, 0);
+    doc.rect(20, 30, 170, 40); // Border
+    const lines = doc.splitTextToSize(`Results:\n${details}`, 160);
+    doc.text(lines, 25, 40);
+    // Footer
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 290);
+    doc.text("Page 1 of 1", 180, 290);
     doc.save(`${type.replace(/\s+/g, "_").toLowerCase()}_result.pdf`);
     downloadSound.play();
   };
