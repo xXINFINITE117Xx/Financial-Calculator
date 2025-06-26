@@ -5,11 +5,67 @@ document.addEventListener("DOMContentLoaded", () => {
   const notificationSound = document.getElementById("notification-sound");
   const downloadSound = document.getElementById("download-sound");
 
+  // Charts
+  let siChart,
+    ciChart,
+    loanChart,
+    mortgageChart,
+    savingsChart,
+    budgetChart,
+    icChart,
+    efChart;
+
+  // History
+  let history = JSON.parse(localStorage.getItem("calcHistory")) || [];
+
+  // jsPDF
+  const { jsPDF } = window.jspdf;
+
   // Loading Screen
   const loadingScreen = document.getElementById("loading-screen");
   setTimeout(() => {
     loadingScreen.classList.add("hidden");
-  }, 1500);
+  }, 2000);
+
+  // Particles.js
+  particlesJS("particles-js", {
+    particles: {
+      number: { value: 80, density: { enable: true, value_area: 800 } },
+      color: { value: ["#00ff99", "#ffd700"] },
+      shape: { type: "circle" },
+      opacity: { value: 0.5, random: true },
+      size: { value: 3, random: true },
+      line_linked: {
+        enable: true,
+        distance: 150,
+        color: "#00ff99",
+        opacity: 0.4,
+        width: 1,
+      },
+      move: {
+        enable: true,
+        speed: 6,
+        direction: "none",
+        random: false,
+        straight: false,
+        out_mode: "out",
+        bounce: false,
+      },
+    },
+    interactivity: {
+      detect_on: "canvas",
+      events: {
+        onhover: { enable: true, mode: "repulse" },
+        onclick: { enable: true, mode: "push" },
+        resize: true,
+      },
+      modes: {
+        repulse: { distance: 100, duration: 0.4 },
+        push: { particles_nb: 4 },
+      },
+    },
+    retina_detect: true,
+  });
 
   // Tutorial
   const tutorialModal = document.getElementById("tutorial-modal");
@@ -20,16 +76,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const tutorialBtn = document.getElementById("tutorial-btn");
 
   const tutorialSteps = [
-    "<p><strong>Step 1: Overview</strong><br>Welcome to the Financial Calculator! This tool helps you plan your finances with a sleek, gamer-inspired interface. Use the tabs to navigate between different calculators.</p>",
-    '<p><strong>Step 2: Simple Interest</strong><br>Calculate interest earned on a principal amount with a fixed rate over time. Enter the principal, annual rate, and years, then click "Calculate".</p>',
-    "<p><strong>Step 3: Compound Interest</strong><br>Explore how your investment grows with compounding. Input principal, rate, compounding frequency, and time to see your returns.</p>",
-    "<p><strong>Step 4: Loan Payment</strong><br>Determine monthly payments for a loan. Provide the loan amount, monthly rate, and number of payments to get a breakdown.</p>",
-    "<p><strong>Step 5: Mortgage Calculator</strong><br>Plan your home purchase by calculating monthly mortgage payments and checking affordability based on your income.</p>",
-    "<p><strong>Step 6: Savings Goal</strong><br>Set a savings target and find out how much you need to save monthly to reach it within a specified time.</p>",
-    "<p><strong>Step 7: Budget Planner</strong><br>Track your income and expenses, visualize spending with a pie chart, and see potential savings.</p>",
-    "<p><strong>Step 8: Investment Comparison</strong><br>Compare multiple investment scenarios side-by-side by adding scenarios and entering different principals, rates, and times.</p>",
-    "<p><strong>Step 9: Emergency Fund</strong><br>Calculate how much you need for an emergency fund based on your monthly expenses and desired coverage period.</p>",
-    "<p><strong>Step 10: Sounds & Interactions</strong><br>Enjoy a gaming experience with sounds for button clicks (interaction), successful calculations (achievement), errors (notification), and more. Click any button to hear it!</p>",
+    "<p><strong>Step 1: Overview</strong><br>Welcome to the Financial Calculator! Navigate using tabs, visualize results with bar charts, track calculations in the history modal, and export results as PDF or Excel.</p>",
+    "<p><strong>Step 2: Simple Interest</strong><br>Calculate interest with principal, rate, and time. View results in a bar chart and download as PDF.</p>",
+    "<p><strong>Step 3: Compound Interest</strong><br>See investment growth with compounding. The chart shows principal vs. total amount, with PDF export.</p>",
+    "<p><strong>Step 4: Loan Payment</strong><br>Calculate monthly loan payments. The chart breaks down principal, interest, and total paid, with PDF export.</p>",
+    "<p><strong>Step 5: Mortgage Calculator</strong><br>Plan your mortgage with affordability checks. The chart compares payment and max affordable payment, with PDF export.</p>",
+    "<p><strong>Step 6: Savings Goal</strong><br>Determine monthly savings needed. The chart shows current savings vs. goal, with PDF export.</p>",
+    "<p><strong>Step 7: Budget Planner</strong><br>Track expenses and savings with a pie chart for spending categories, with PDF export.</p>",
+    "<p><strong>Step 8: Investment Comparison</strong><br>Compare investment scenarios. The chart displays total amounts for each scenario, with PDF export.</p>",
+    "<p><strong>Step 9: Emergency Fund</strong><br>Calculate your emergency fund needs. The chart shows monthly expenses vs. fund needed, with PDF export.</p>",
+    "<p><strong>Step 10: History & Export</strong><br>View past calculations in the history modal and export to Excel or PDF. Enjoy interactive sounds and animations!</p>",
   ];
 
   let currentStep = 0;
@@ -68,6 +124,110 @@ document.addEventListener("DOMContentLoaded", () => {
     tutorialModal.classList.add("hidden");
   });
 
+  // History Modal
+  const historyModal = document.getElementById("history-modal");
+  const historyContent = document.getElementById("history-content");
+  const historyClose = document.getElementById("history-close");
+  const clearHistory = document.getElementById("clear-history");
+  const exportExcel = document.getElementById("export-excel");
+  const exportPDF = document.getElementById("export-pdf");
+  const historyBtn = document.getElementById("history-btn");
+
+  const updateHistoryDisplay = () => {
+    if (history.length === 0) {
+      historyContent.innerHTML = "<p>No calculations yet.</p>";
+    } else {
+      historyContent.innerHTML = history
+        .map(
+          (entry, index) => `
+                <div class="mb-4">
+                    <h3 class="font-semibold text-[#00ff99]">Calculation ${
+                      index + 1
+                    }: ${entry.type}</h3>
+                    <p>${entry.details}</p>
+                    <p class="text-sm text-gray-400">Timestamp: ${
+                      entry.timestamp
+                    }</p>
+                </div>
+            `
+        )
+        .join("");
+    }
+  };
+
+  historyBtn.addEventListener("click", () => {
+    interactionSound.play();
+    updateHistoryDisplay();
+    historyModal.classList.remove("hidden");
+  });
+
+  historyClose.addEventListener("click", () => {
+    interactionSound.play();
+    historyModal.classList.add("hidden");
+  });
+
+  clearHistory.addEventListener("click", () => {
+    interactionSound.play();
+    history = [];
+    localStorage.setItem("calcHistory", JSON.stringify(history));
+    updateHistoryDisplay();
+    notificationSound.play();
+    alert("History cleared.");
+  });
+
+  exportExcel.addEventListener("click", () => {
+    interactionSound.play();
+    if (history.length === 0) {
+      notificationSound.play();
+      alert("No history to export.");
+      return;
+    }
+    const ws_data = [["Type", "Details", "Timestamp"]];
+    history.forEach((entry) => {
+      ws_data.push([entry.type, entry.details, entry.timestamp]);
+    });
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "History");
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([wbout], { type: "application/octet-stream" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "financial_calculator_history.xlsx";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    downloadSound.play();
+  });
+
+  exportPDF.addEventListener("click", () => {
+    interactionSound.play();
+    if (history.length === 0) {
+      notificationSound.play();
+      alert("No history to export.");
+      return;
+    }
+    const doc = new jsPDF();
+    doc.setFont("helvetica");
+    doc.setFontSize(12);
+    doc.text("Financial Calculator History", 20, 20);
+    let y = 30;
+    history.forEach((entry, index) => {
+      doc.text(`Calculation ${index + 1}: ${entry.type}`, 20, y);
+      doc.text(`Details: ${entry.details}`, 20, y + 10);
+      doc.text(`Timestamp: ${entry.timestamp}`, 20, y + 20);
+      y += 40;
+      if (y > 260) {
+        doc.addPage();
+        y = 20;
+      }
+    });
+    doc.save("financial_calculator_history.pdf");
+    downloadSound.play();
+  });
+
   // Tab switching
   const tabs = document.querySelectorAll(".tab-btn");
   const panels = document.querySelectorAll(".tab-panel");
@@ -100,7 +260,65 @@ document.addEventListener("DOMContentLoaded", () => {
     return true;
   };
 
+  const saveToHistory = (type, details) => {
+    const timestamp = new Date().toLocaleString();
+    history.push({ type, details, timestamp });
+    localStorage.setItem("calcHistory", JSON.stringify(history));
+  };
+
+  const createBarChart = (canvasId, labels, data, chartRef) => {
+    if (chartRef) chartRef.destroy();
+    const ctx = document.getElementById(canvasId).getContext("2d");
+    return new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [
+          {
+            data,
+            backgroundColor: ["#00ff99", "#ffd700", "#ff4d4d", "#4d79ff"],
+            borderColor: "#1a1a1a",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          title: {
+            display: true,
+            text: "Calculation Breakdown",
+            color: "#e0e0e0",
+          },
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { color: "#e0e0e0" } },
+          x: { ticks: { color: "#e0e0e0" } },
+        },
+      },
+    });
+  };
+
+  const downloadResultPDF = (type, details) => {
+    const doc = new jsPDF();
+    doc.setFont("helvetica");
+    doc.setFontSize(12);
+    doc.text(`Financial Calculator - ${type}`, 20, 20);
+    doc.text("Results:", 20, 30);
+    const lines = doc.splitTextToSize(details, 160);
+    doc.text(lines, 20, 40);
+    doc.text(
+      `Timestamp: ${new Date().toLocaleString()}`,
+      20,
+      lines.length * 10 + 50
+    );
+    doc.save(`${type.replace(/\s+/g, "_").toLowerCase()}_result.pdf`);
+    downloadSound.play();
+  };
+
   // Simple Interest
+  let siResult = "";
   document
     .getElementById("simple-interest-form")
     .addEventListener("submit", (e) => {
@@ -114,15 +332,41 @@ document.addEventListener("DOMContentLoaded", () => {
       if (validateInputs([principal, rate, time])) {
         const interest = principal * rate * time;
         const total = principal + interest;
-        document.getElementById("si-result").innerHTML = `
-                <p>Interest Earned: ${formatCurrency(interest)}</p>
-                <p>Total Amount: ${formatCurrency(total)}</p>
+        siResult = `
+                Interest Earned: ${formatCurrency(interest)}
+                Total Amount: ${formatCurrency(total)}
             `;
+        document.getElementById("si-result").innerHTML = siResult;
+        siChart = createBarChart(
+          "si-chart",
+          ["Principal", "Interest"],
+          [principal, interest],
+          siChart
+        );
+        saveToHistory(
+          "Simple Interest",
+          `Principal: ${formatCurrency(principal)}, Rate: ${(
+            rate * 100
+          ).toFixed(2)}%, Time: ${time} years, Interest: ${formatCurrency(
+            interest
+          )}, Total: ${formatCurrency(total)}`
+        );
         achievementSound.play();
       }
     });
 
+  document.getElementById("si-pdf").addEventListener("click", () => {
+    interactionSound.play();
+    if (!siResult) {
+      notificationSound.play();
+      alert("Please perform a calculation first.");
+      return;
+    }
+    downloadResultPDF("Simple Interest", siResult);
+  });
+
   // Compound Interest
+  let ciResult = "";
   document
     .getElementById("compound-interest-form")
     .addEventListener("submit", (e) => {
@@ -140,15 +384,43 @@ document.addEventListener("DOMContentLoaded", () => {
         const total =
           principal * Math.pow(1 + rate / compounds, compounds * time);
         const interest = total - principal;
-        document.getElementById("ci-result").innerHTML = `
-                <p>Interest Earned: ${formatCurrency(interest)}</p>
-                <p>Total Amount: ${formatCurrency(total)}</p>
+        ciResult = `
+                Interest Earned: ${formatCurrency(interest)}
+                Total Amount: ${formatCurrency(total)}
             `;
+        document.getElementById("ci-result").innerHTML = ciResult;
+        ciChart = createBarChart(
+          "ci-chart",
+          ["Principal", "Interest"],
+          [principal, interest],
+          ciChart
+        );
+        saveToHistory(
+          "Compound Interest",
+          `Principal: ${formatCurrency(principal)}, Rate: ${(
+            rate * 100
+          ).toFixed(
+            2
+          )}%, Compounds: ${compounds}, Time: ${time} years, Interest: ${formatCurrency(
+            interest
+          )}, Total: ${formatCurrency(total)}`
+        );
         achievementSound.play();
       }
     });
 
+  document.getElementById("ci-pdf").addEventListener("click", () => {
+    interactionSound.play();
+    if (!ciResult) {
+      notificationSound.play();
+      alert("Please perform a calculation first.");
+      return;
+    }
+    downloadResultPDF("Compound Interest", ciResult);
+  });
+
   // Loan Payment
+  let loanResult = "";
   document
     .getElementById("loan-payment-form")
     .addEventListener("submit", (e) => {
@@ -167,16 +439,44 @@ document.addEventListener("DOMContentLoaded", () => {
           (Math.pow(1 + rate, payments) - 1);
         const totalPaid = monthlyPayment * payments;
         const totalInterest = totalPaid - principal;
-        document.getElementById("loan-result").innerHTML = `
-                <p>Monthly Payment: ${formatCurrency(monthlyPayment)}</p>
-                <p>Total Paid: ${formatCurrency(totalPaid)}</p>
-                <p>Total Interest: ${formatCurrency(totalInterest)}</p>
+        loanResult = `
+                Monthly Payment: ${formatCurrency(monthlyPayment)}
+                Total Paid: ${formatCurrency(totalPaid)}
+                Total Interest: ${formatCurrency(totalInterest)}
             `;
+        document.getElementById("loan-result").innerHTML = loanResult;
+        loanChart = createBarChart(
+          "loan-chart",
+          ["Principal", "Interest", "Total Paid"],
+          [principal, totalInterest, totalPaid],
+          loanChart
+        );
+        saveToHistory(
+          "Loan Payment",
+          `Principal: ${formatCurrency(principal)}, Rate: ${(
+            rate * 100
+          ).toFixed(2)}%, Payments: ${payments}, Monthly: ${formatCurrency(
+            monthlyPayment
+          )}, Total Interest: ${formatCurrency(
+            totalInterest
+          )}, Total Paid: ${formatCurrency(totalPaid)}`
+        );
         achievementSound.play();
       }
     });
 
+  document.getElementById("loan-pdf").addEventListener("click", () => {
+    interactionSound.play();
+    if (!loanResult) {
+      notificationSound.play();
+      alert("Please perform a calculation first.");
+      return;
+    }
+    downloadResultPDF("Loan Payment", loanResult);
+  });
+
   // Mortgage Calculator
+  let mortgageResult = "";
   document.getElementById("mortgage-form").addEventListener("submit", (e) => {
     e.preventDefault();
     interactionSound.play();
@@ -199,17 +499,45 @@ document.addEventListener("DOMContentLoaded", () => {
       const totalInterest = totalPaid - principal;
       const maxPayment = income * maxPercent;
       const affordable = monthlyPayment <= maxPayment ? "Yes" : "No";
-      document.getElementById("mortgage-result").innerHTML = `
-                <p>Monthly Payment: ${formatCurrency(monthlyPayment)}</p>
-                <p>Total Paid: ${formatCurrency(totalPaid)}</p>
-                <p>Total Interest: ${formatCurrency(totalInterest)}</p>
-                <p>Within ${maxPercent * 100}% of Income: ${affordable}</p>
+      mortgageResult = `
+                Monthly Payment: ${formatCurrency(monthlyPayment)}
+                Total Paid: ${formatCurrency(totalPaid)}
+                Total Interest: ${formatCurrency(totalInterest)}
+                Within ${maxPercent * 100}% of Income: ${affordable}
             `;
+      document.getElementById("mortgage-result").innerHTML = mortgageResult;
+      mortgageChart = createBarChart(
+        "mortgage-chart",
+        ["Monthly Payment", "Max Affordable"],
+        [monthlyPayment, maxPayment],
+        mortgageChart
+      );
+      saveToHistory(
+        "Mortgage",
+        `Principal: ${formatCurrency(principal)}, Rate: ${(
+          annualRate * 100
+        ).toFixed(2)}%, Term: ${term} years, Income: ${formatCurrency(
+          income
+        )}, Max %: ${maxPercent * 100}%, Monthly: ${formatCurrency(
+          monthlyPayment
+        )}, Affordable: ${affordable}`
+      );
       achievementSound.play();
     }
   });
 
+  document.getElementById("mortgage-pdf").addEventListener("click", () => {
+    interactionSound.play();
+    if (!mortgageResult) {
+      notificationSound.play();
+      alert("Please perform a calculation first.");
+      return;
+    }
+    downloadResultPDF("Mortgage", mortgageResult);
+  });
+
   // Savings Goal
+  let savingsResult = "";
   document
     .getElementById("savings-goal-form")
     .addEventListener("submit", (e) => {
@@ -226,9 +554,22 @@ document.addEventListener("DOMContentLoaded", () => {
       );
       if (validateInputs([goal, current, months]) && goal >= current) {
         const monthlySavings = (goal - current) / months;
-        document.getElementById("savings-result").innerHTML = `
-                <p>Monthly Savings Needed: ${formatCurrency(monthlySavings)}</p>
+        savingsResult = `
+                Monthly Savings Needed: ${formatCurrency(monthlySavings)}
             `;
+        document.getElementById("savings-result").innerHTML = savingsResult;
+        savingsChart = createBarChart(
+          "savings-chart",
+          ["Current", "Goal", "Monthly Needed"],
+          [current, goal, monthlySavings],
+          savingsChart
+        );
+        saveToHistory(
+          "Savings Goal",
+          `Goal: ${formatCurrency(goal)}, Current: ${formatCurrency(
+            current
+          )}, Months: ${months}, Monthly: ${formatCurrency(monthlySavings)}`
+        );
         achievementSound.play();
       } else {
         notificationSound.play();
@@ -236,8 +577,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
+  document.getElementById("savings-pdf").addEventListener("click", () => {
+    interactionSound.play();
+    if (!savingsResult) {
+      notificationSound.play();
+      alert("Please perform a calculation first.");
+      return;
+    }
+    downloadResultPDF("Savings Goal", savingsResult);
+  });
+
   // Budget Planner
-  let budgetChart = null;
+  let budgetResult = "";
   document.getElementById("budget-form").addEventListener("submit", (e) => {
     e.preventDefault();
     interactionSound.play();
@@ -264,16 +615,15 @@ document.addEventListener("DOMContentLoaded", () => {
         Utilities: ((utilities / totalExpenses) * 100).toFixed(2),
         Other: ((other / totalExpenses) * 100).toFixed(2),
       };
-      document.getElementById("budget-result").innerHTML = `
-                <p>Total Expenses: ${formatCurrency(totalExpenses)}</p>
-                <p>Food: ${percentages.Food}%</p>
-                <p>Transport: ${percentages.Transport}%</p>
-                <p>Utilities: ${percentages.Utilities}%</p>
-                <p>Other: ${percentages.Other}%</p>
-                <p>Possible Savings: ${formatCurrency(savings)}</p>
+      budgetResult = `
+                Total Expenses: ${formatCurrency(totalExpenses)}
+                Food: ${percentages.Food}%
+                Transport: ${percentages.Transport}%
+                Utilities: ${percentages.Utilities}%
+                Other: ${percentages.Other}%
+                Possible Savings: ${formatCurrency(savings)}
             `;
-
-      // Update Chart
+      document.getElementById("budget-result").innerHTML = budgetResult;
       if (budgetChart) budgetChart.destroy();
       const ctx = document.getElementById("budget-chart").getContext("2d");
       budgetChart = new Chart(ctx, {
@@ -295,11 +645,32 @@ document.addEventListener("DOMContentLoaded", () => {
           },
         },
       });
+      saveToHistory(
+        "Budget",
+        `Income: ${formatCurrency(income)}, Expenses: ${formatCurrency(
+          totalExpenses
+        )}, Savings: ${formatCurrency(savings)}, Food: ${
+          percentages.Food
+        }%, Transport: ${percentages.Transport}%, Utilities: ${
+          percentages.Utilities
+        }%, Other: ${percentages.Other}%`
+      );
       achievementSound.play();
     }
   });
 
+  document.getElementById("budget-pdf").addEventListener("click", () => {
+    interactionSound.play();
+    if (!budgetResult) {
+      notificationSound.play();
+      alert("Please perform a calculation first.");
+      return;
+    }
+    downloadResultPDF("Budget Planner", budgetResult);
+  });
+
   // Investment Comparison
+  let icResult = "";
   let scenarioCount = 1;
   document.getElementById("add-scenario").addEventListener("click", () => {
     interactionSound.play();
@@ -333,6 +704,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "#investment-scenarios .scenario"
       );
       let valid = true;
+      const results = [];
       scenarios.forEach((scenario) => {
         const principal = parseFloat(
           scenario.querySelector('input[name="ic-principal"]').value
@@ -344,36 +716,74 @@ document.addEventListener("DOMContentLoaded", () => {
           scenario.querySelector('input[name="ic-time"]').value
         );
         if (!validateInputs([principal, rate, time])) valid = false;
+        else
+          results.push({
+            principal,
+            rate,
+            time,
+            total: principal * Math.pow(1 + rate / 100, time),
+          });
       });
       if (valid) {
-        let results = "";
-        scenarios.forEach((scenario, index) => {
-          const principal = parseFloat(
-            scenario.querySelector('input[name="ic-principal"]').value
-          );
-          const rate =
-            parseFloat(scenario.querySelector('input[name="ic-rate"]').value) /
-            100;
-          const time = parseFloat(
-            scenario.querySelector('input[name="ic-time"]').value
-          );
-          const total = principal * Math.pow(1 + rate, time);
-          results += `
+        icResult = results
+          .map(
+            (res, index) => `
+                Scenario ${index + 1}:
+                Principal: ${formatCurrency(res.principal)}
+                Interest Rate: ${res.rate.toFixed(2)}%
+                Time: ${res.time} years
+                Total Amount: ${formatCurrency(res.total)}
+            `
+          )
+          .join("\n");
+        let html = "";
+        results.forEach((res, index) => {
+          html += `
                     <div class="scenario-result">
                         <h3 class="font-semibold">Scenario ${index + 1}</h3>
-                        <p>Principal: ${formatCurrency(principal)}</p>
-                        <p>Interest Rate: ${(rate * 100).toFixed(2)}%</p>
-                        <p>Time: ${time} years</p>
-                        <p>Total Amount: ${formatCurrency(total)}</p>
+                        <p>Principal: ${formatCurrency(res.principal)}</p>
+                        <p>Interest Rate: ${res.rate.toFixed(2)}%</p>
+                        <p>Time: ${res.time} years</p>
+                        <p>Total Amount: ${formatCurrency(res.total)}</p>
                     </div>
                 `;
         });
-        document.getElementById("ic-result").innerHTML = results;
+        document.getElementById("ic-result").innerHTML = html;
+        icChart = createBarChart(
+          "ic-chart",
+          results.map((_, i) => `Scenario ${i + 1}`),
+          results.map((r) => r.total),
+          icChart
+        );
+        saveToHistory(
+          "Investment Comparison",
+          results
+            .map(
+              (r, i) =>
+                `Scenario ${i + 1}: Principal: ${formatCurrency(
+                  r.principal
+                )}, Rate: ${r.rate.toFixed(2)}%, Time: ${
+                  r.time
+                } years, Total: ${formatCurrency(r.total)}`
+            )
+            .join("; ")
+        );
         achievementSound.play();
       }
     });
 
+  document.getElementById("ic-pdf").addEventListener("click", () => {
+    interactionSound.play();
+    if (!icResult) {
+      notificationSound.play();
+      alert("Please perform a calculation first.");
+      return;
+    }
+    downloadResultPDF("Investment Comparison", icResult);
+  });
+
   // Emergency Fund
+  let efResult = "";
   document
     .getElementById("emergency-fund-form")
     .addEventListener("submit", (e) => {
@@ -383,20 +793,36 @@ document.addEventListener("DOMContentLoaded", () => {
       const months = parseFloat(document.getElementById("ef-months").value);
       if (validateInputs([expenses, months])) {
         const fundNeeded = expenses * months;
-        document.getElementById("ef-result").innerHTML = `
-                <p>Emergency Fund Needed: ${formatCurrency(fundNeeded)}</p>
-                <p>(Based on ${months} months of ${formatCurrency(
+        efResult = `
+                Emergency Fund Needed: ${formatCurrency(fundNeeded)}
+                (Based on ${months} months of ${formatCurrency(
           expenses
-        )} monthly expenses)</p>
+        )} monthly expenses)
             `;
+        document.getElementById("ef-result").innerHTML = efResult;
+        efChart = createBarChart(
+          "ef-chart",
+          ["Monthly Expenses", "Fund Needed"],
+          [expenses, fundNeeded],
+          efChart
+        );
+        saveToHistory(
+          "Emergency Fund",
+          `Expenses: ${formatCurrency(
+            expenses
+          )}, Months: ${months}, Fund Needed: ${formatCurrency(fundNeeded)}`
+        );
         achievementSound.play();
       }
     });
 
-  // Download Button (Future Feature Placeholder)
-  // Example: Add a download button to export results as CSV
-  // document.getElementById('download-results').addEventListener('click', () => {
-  //     downloadSound.play();
-  //     // Implement CSV export logic here
-  // });
+  document.getElementById("ef-pdf").addEventListener("click", () => {
+    interactionSound.play();
+    if (!efResult) {
+      notificationSound.play();
+      alert("Please perform a calculation first.");
+      return;
+    }
+    downloadResultPDF("Emergency Fund", efResult);
+  });
 });

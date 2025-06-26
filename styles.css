@@ -7,6 +7,14 @@ body {
     justify-content: center;
     align-items: center;
     overflow-x: hidden;
+    position: relative;
+}
+
+#particles-js {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
 }
 
 .container {
@@ -17,6 +25,12 @@ body {
     box-shadow: 0 0 20px rgba(0, 255, 153, 0.5), inset 0 0 10px rgba(0, 255, 153, 0.3);
     max-width: 900px;
     width: 100%;
+    z-index: 10;
+    transition: transform 0.3s ease;
+}
+
+.container:hover {
+    transform: scale(1.02);
 }
 
 h1 {
@@ -45,6 +59,24 @@ h1 {
     border: 1px solid #00ff99;
     text-transform: uppercase;
     font-size: 0.9rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.tab-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 153, 0.3), transparent);
+    transition: 0.5s;
+}
+
+.tab-btn:hover::after,
+.tab-btn.active::after {
+    left: 100%;
 }
 
 .tab-btn:hover,
@@ -60,6 +92,7 @@ h1 {
     background: rgba(20, 20, 20, 0.9);
     border-radius: 0 0 10px 10px;
     border: 1px solid #00ff99;
+    animation: slide-in 0.3s ease;
 }
 
 .tab-panel.active {
@@ -90,11 +123,13 @@ input {
     padding: 0.5rem;
     border-radius: 5px;
     transition: all 0.3s ease;
+    position: relative;
 }
 
 input:focus {
     outline: none;
-    box-shadow: 0 0 10px #00ff99;
+    box-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99;
+    transform: scale(1.01);
 }
 
 button {
@@ -107,14 +142,53 @@ button {
     font-weight: bold;
     text-transform: uppercase;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+    transition: 0.5s;
+}
+
+button.pdf-btn {
+    background: #4d79ff;
+}
+
+button.pdf-btn::after {
+    background: linear-gradient(90deg, transparent, rgba(77, 121, 255, 0.3), transparent);
+}
+
+button:hover::after,
+button.pdf-btn:hover::after {
+    left: 100%;
 }
 
 button:hover {
     background: #00ff99;
     box-shadow: 0 0 15px #00ff99;
+    transform: translateY(-2px);
 }
 
-#budget-chart {
+button.pdf-btn:hover {
+    background: #00ff99;
+    box-shadow: 0 0 15px #00ff99;
+}
+
+#budget-chart,
+#si-chart,
+#ci-chart,
+#loan-chart,
+#mortgage-chart,
+#savings-chart,
+#ic-chart,
+#ef-chart {
     max-width: 400px;
     margin: 1rem auto;
 }
@@ -129,6 +203,11 @@ button:hover {
     background: rgba(0, 255, 153, 0.1);
     border: 1px solid #00ff99;
     border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.scenario:hover {
+    transform: scale(1.05);
 }
 
 #loading-screen {
@@ -140,17 +219,32 @@ button:hover {
     pointer-events: none;
 }
 
-#tutorial-modal {
+#loading-progress {
+    width: 0;
+    animation: load-progress 2s ease-in-out forwards;
+}
+
+#tutorial-modal,
+#history-modal {
     transition: opacity 0.3s ease;
 }
 
-#tutorial-modal.hidden {
+#tutorial-modal.hidden,
+#history-modal.hidden {
     display: none;
 }
 
-#tutorial-content p {
+#tutorial-content p,
+#history-content p {
     margin-bottom: 1rem;
     line-height: 1.5;
+}
+
+#history-content {
+    padding: 1rem;
+    background: rgba(20, 20, 20, 0.9);
+    border: 1px solid #00ff99;
+    border-radius: 8px;
 }
 
 @keyframes neon-flicker {
@@ -164,6 +258,28 @@ button:hover {
 
     100% {
         text-shadow: 0 0 5px #ffd700, 0 0 15px #00ff99;
+    }
+}
+
+@keyframes slide-in {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes load-progress {
+    0% {
+        width: 0;
+    }
+
+    100% {
+        width: 100%;
     }
 }
 
