@@ -1,224 +1,260 @@
-function playSound(type) {
-  const sounds = {
-    notification: document.getElementById("notificationSound"),
-    interaction: document.getElementById("interactionSound"),
-    achievement: document.getElementById("achievementSound"),
-    query: document.getElementById("querySound"),
-  };
-  if (sounds[type]) {
-    sounds[type]
-      .play()
-      .catch((error) => console.log("Error al reproducir audio:", error));
-  }
-}
+document.addEventListener("DOMContentLoaded", () => {
+  // Tab switching
+  const tabs = document.querySelectorAll(".tab-btn");
+  const panels = document.querySelectorAll(".tab-panel");
 
-function showSection(sectionId) {
-  playSound("interaction");
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      tabs.forEach((t) => t.classList.remove("active"));
+      panels.forEach((p) => p.classList.remove("active"));
+      tab.classList.add("active");
+      document.getElementById(tab.dataset.tab).classList.add("active");
+    });
+  });
+
+  // Set default tab
+  tabs[0].classList.add("active");
+  panels[0].classList.add("active");
+
+  // Financial Calculations
+  const formatCurrency = (value) => `$${parseFloat(value).toFixed(2)}`;
+
+  // Simple Interest
   document
-    .querySelectorAll(".section")
-    .forEach((section) => section.classList.add("hidden"));
-  document.getElementById(sectionId).classList.remove("hidden");
-}
-
-function calculateBasic() {
-  playSound("interaction");
-  const capital = parseFloat(document.getElementById("basicCapital").value);
-  const rate = parseFloat(document.getElementById("basicRate").value) / 100;
-  const time = parseFloat(document.getElementById("basicTime").value);
-
-  if (isNaN(capital) || isNaN(rate) || isNaN(time)) {
-    playSound("notification");
-    document.getElementById("basicResult").innerHTML =
-      "Por favor, ingrese valores válidos.";
-    return;
-  }
-
-  const simpleInterest = capital * rate * time;
-  const compoundInterest = capital * (Math.pow(1 + rate, time) - 1);
-  const effectiveRate = Math.pow(1 + rate / 12, 12) - 1;
-  const nominalRate = rate * 12;
-
-  document.getElementById("basicResult").innerHTML = `
-        Interés Simple: $${simpleInterest.toFixed(2)}<br>
-        Interés Compuesto: $${compoundInterest.toFixed(2)}<br>
-        Tasa Efectiva Anual: ${(effectiveRate * 100).toFixed(2)}%<br>
-        Tasa Nominal Mensual: ${((nominalRate * 100) / 12).toFixed(2)}%
-    `;
-  playSound("query");
-  playSound("achievement");
-}
-
-function calculateLoan() {
-  playSound("interaction");
-  const amount = parseFloat(document.getElementById("loanAmount").value);
-  const rate = parseFloat(document.getElementById("loanRate").value) / 100 / 12;
-  const term = parseInt(document.getElementById("loanTerm").value);
-
-  if (isNaN(amount) || isNaN(rate) || isNaN(term)) {
-    playSound("notification");
-    document.getElementById("loanResult").innerHTML =
-      "Por favor, ingrese valores válidos.";
-    return;
-  }
-
-  const payment =
-    (amount * (rate * Math.pow(1 + rate, term))) /
-    (Math.pow(1 + rate, term) - 1);
-  let balance = amount;
-  let tableBody = "";
-
-  for (let i = 1; i <= term; i++) {
-    const interest = balance * rate;
-    const principal = payment - interest;
-    balance -= principal;
-    tableBody += `
-            <tr>
-                <td>${i}</td>
-                <td>$${payment.toFixed(2)}</td>
-                <td>$${interest.toFixed(2)}</td>
-                <td>$${principal.toFixed(2)}</td>
-                <td>$${balance.toFixed(2)}</td>
-            </tr>
+    .getElementById("simple-interest-form")
+    .addEventListener("submit", (e) => {
+      e.preventDefault();
+      const principal = parseFloat(
+        document.getElementById("si-principal").value
+      );
+      const rate = parseFloat(document.getElementById("si-rate").value) / 100;
+      const time = parseFloat(document.getElementById("si-time").value);
+      const interest = principal * rate * time;
+      const total = principal + interest;
+      document.getElementById("si-result").innerHTML = `
+            <p>Interest Earned: ${formatCurrency(interest)}</p>
+            <p>Total Amount: ${formatCurrency(total)}</p>
         `;
-  }
+    });
 
-  document.getElementById(
-    "loanResult"
-  ).innerHTML = `Cuota Mensual: $${payment.toFixed(2)}`;
-  document.getElementById("amortizationBody").innerHTML = tableBody;
-  playSound("query");
-  playSound("achievement");
-}
+  // Compound Interest
+  document
+    .getElementById("compound-interest-form")
+    .addEventListener("submit", (e) => {
+      e.preventDefault();
+      const principal = parseFloat(
+        document.getElementById("ci-principal").value
+      );
+      const rate = parseFloat(document.getElementById("ci-rate").value) / 100;
+      const compounds = parseFloat(
+        document.getElementById("ci-compounds").value
+      );
+      const time = parseFloat(document.getElementById("ci-time").value);
+      const total =
+        principal * Math.pow(1 + rate / compounds, compounds * time);
+      const interest = total - principal;
+      document.getElementById("ci-result").innerHTML = `
+            <p>Interest Earned: ${formatCurrency(interest)}</p>
+            <p>Total Amount: ${formatCurrency(total)}</p>
+        `;
+    });
 
-function exportAmortization(format) {
-  playSound("interaction");
-  const table = document.getElementById("amortizationTable");
-  const rows = table.querySelectorAll("tr");
-  const data = [];
+  // Loan Payment
+  document
+    .getElementById("loan-payment-form")
+    .addEventListener("submit", (e) => {
+      e.preventDefault();
+      const principal = parseFloat(
+        document.getElementById("loan-principal").value
+      );
+      const rate = parseFloat(document.getElementById("loan-rate").value) / 100;
+      const payments = parseFloat(
+        document.getElementById("loan-payments").value
+      );
+      const monthlyPayment =
+        (principal * (rate * Math.pow(1 + rate, payments))) /
+        (Math.pow(1 + rate, payments) - 1);
+      const totalPaid = monthlyPayment * payments;
+      const totalInterest = totalPaid - principal;
+      document.getElementById("loan-result").innerHTML = `
+            <p>Monthly Payment: ${formatCurrency(monthlyPayment)}</p>
+            <p>Total Paid: ${formatCurrency(totalPaid)}</p>
+            <p>Total Interest: ${formatCurrency(totalInterest)}</p>
+        `;
+    });
 
-  rows.forEach((row) => {
-    const cols = row.querySelectorAll("td, th");
-    const rowData = [];
-    cols.forEach((col) => rowData.push(col.innerText));
-    data.push(rowData);
+  // Mortgage Calculator
+  document.getElementById("mortgage-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const principal = parseFloat(
+      document.getElementById("mortgage-principal").value
+    );
+    const annualRate =
+      parseFloat(document.getElementById("mortgage-rate").value) / 100;
+    const term = parseFloat(document.getElementById("mortgage-term").value);
+    const income = parseFloat(document.getElementById("mortgage-income").value);
+    const maxPercent =
+      parseFloat(document.getElementById("mortgage-max-percent").value) / 100;
+    const monthlyRate = annualRate / 12;
+    const payments = term * 12;
+    const monthlyPayment =
+      (principal * (monthlyRate * Math.pow(1 + monthlyRate, payments))) /
+      (Math.pow(1 + monthlyRate, payments) - 1);
+    const totalPaid = monthlyPayment * payments;
+    const totalInterest = totalPaid - principal;
+    const maxPayment = income * maxPercent;
+    const affordable = monthlyPayment <= maxPayment ? "Yes" : "No";
+    document.getElementById("mortgage-result").innerHTML = `
+            <p>Monthly Payment: ${formatCurrency(monthlyPayment)}</p>
+            <p>Total Paid: ${formatCurrency(totalPaid)}</p>
+            <p>Total Interest: ${formatCurrency(totalInterest)}</p>
+            <p>Within ${maxPercent * 100}% of Income: ${affordable}</p>
+        `;
   });
 
-  if (format === "pdf") {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.text("Tabla de Amortización", 10, 10);
-    doc.autoTable({
-      head: [data[0]],
-      body: data.slice(1),
+  // Savings Goal
+  document
+    .getElementById("savings-goal-form")
+    .addEventListener("submit", (e) => {
+      e.preventDefault();
+      const goal = parseFloat(
+        document.getElementById("savings-goal-amount").value
+      );
+      const current = parseFloat(
+        document.getElementById("savings-current").value
+      );
+      const months = parseFloat(
+        document.getElementById("savings-months").value
+      );
+      const monthlySavings = (goal - current) / months;
+      document.getElementById("savings-result").innerHTML = `
+            <p>Monthly Savings Needed: ${formatCurrency(monthlySavings)}</p>
+        `;
     });
-    doc.save("amortization.pdf");
-  } else if (format === "excel") {
-    const ws = XLSX.utils.aoa_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Amortization");
-    XLSX.writeFile(wb, "amortization.xlsx");
-  }
-  playSound("achievement");
-}
 
-function calculateInvestments() {
-  playSound("interaction");
-  const initial = parseFloat(document.getElementById("invInitial").value);
-  const cashFlows = document
-    .getElementById("invCashFlows")
-    .value.split(",")
-    .map(Number);
-  const rate = parseFloat(document.getElementById("invRate").value) / 100;
+  // Budget Planner
+  let budgetChart = null;
+  document.getElementById("budget-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const income = parseFloat(document.getElementById("budget-income").value);
+    const food = parseFloat(document.getElementById("budget-food").value);
+    const transport = parseFloat(
+      document.getElementById("budget-transport").value
+    );
+    const utilities = parseFloat(
+      document.getElementById("budget-utilities").value
+    );
+    const other = parseFloat(document.getElementById("budget-other").value);
+    const totalExpenses = food + transport + utilities + other;
+    const savings = income - totalExpenses;
+    const percentages = {
+      Food: ((food / totalExpenses) * 100).toFixed(2),
+      Transport: ((transport / totalExpenses) * 100).toFixed(2),
+      Utilities: ((utilities / totalExpenses) * 100).toFixed(2),
+      Other: ((other / totalExpenses) * 100).toFixed(2),
+    };
+    document.getElementById("budget-result").innerHTML = `
+            <p>Total Expenses: ${formatCurrency(totalExpenses)}</p>
+            <p>Food: ${percentages.Food}%</p>
+            <p>Transport: ${percentages.Transport}%</p>
+            <p>Utilities: ${percentages.Utilities}%</p>
+            <p>Other: ${percentages.Other}%</p>
+            <p>Possible Savings: ${formatCurrency(savings)}</p>
+        `;
 
-  if (isNaN(initial) || cashFlows.some(isNaN) || isNaN(rate)) {
-    playSound("notification");
-    document.getElementById("invResult").innerHTML =
-      "Por favor, ingrese valores válidos.";
-    return;
-  }
-
-  let npv = -initial;
-  cashFlows.forEach((cf, i) => {
-    npv += cf / Math.pow(1 + rate, i + 1);
+    // Update Chart
+    if (budgetChart) budgetChart.destroy();
+    const ctx = document.getElementById("budget-chart").getContext("2d");
+    budgetChart = new Chart(ctx, {
+      type: "pie",
+      data: {
+        labels: ["Food", "Transport", "Utilities", "Other"],
+        datasets: [
+          {
+            data: [food, transport, utilities, other],
+            backgroundColor: ["#00ff99", "#ffd700", "#ff4d4d", "#4d79ff"],
+            borderColor: "#1a1a1a",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: "bottom", labels: { color: "#e0e0e0" } },
+        },
+      },
+    });
   });
 
-  let irr = 0.1;
-  for (let i = 0; i < 100; i++) {
-    let npvTest = -initial;
-    cashFlows.forEach((cf, j) => {
-      npvTest += cf / Math.pow(1 + irr, j + 1);
+  // Investment Comparison
+  let scenarioCount = 1;
+  document.getElementById("add-scenario").addEventListener("click", () => {
+    scenarioCount++;
+    const scenarioDiv = document.createElement("div");
+    scenarioDiv.classList.add("scenario", "mb-4", "border", "p-4", "rounded");
+    scenarioDiv.innerHTML = `
+            <h3 class="font-semibold">Scenario ${scenarioCount}</h3>
+            <div class="mb-2">
+                <label class="block">Principal ($)</label>
+                <input type="number" step="0.01" class="w-full p-2 border rounded" name="ic-principal" required>
+            </div>
+            <div class="mb-2">
+                <label class="block">Annual Interest Rate (%)</label>
+                <input type="number" step="0.01" class="w-full p-2 border rounded" name="ic-rate" required>
+            </div>
+            <div class="mb-2">
+                <label class="block">Time (years)</label>
+                <input type="number" step="0.01" class="w-full p-2 border rounded" name="ic-time" required>
+            </div>
+        `;
+    document.getElementById("investment-scenarios").appendChild(scenarioDiv);
+  });
+
+  document
+    .getElementById("investment-compare-form")
+    .addEventListener("submit", (e) => {
+      e.preventDefault();
+      const scenarios = document.querySelectorAll(
+        "#investment-scenarios .scenario"
+      );
+      let results = "";
+      scenarios.forEach((scenario, index) => {
+        const principal = parseFloat(
+          scenario.querySelector('input[name="ic-principal"]').value
+        );
+        const rate =
+          parseFloat(scenario.querySelector('input[name="ic-rate"]').value) /
+          100;
+        const time = parseFloat(
+          scenario.querySelector('input[name="ic-time"]').value
+        );
+        const total = principal * Math.pow(1 + rate, time);
+        results += `
+                <div class="scenario-result">
+                    <h3 class="font-semibold">Scenario ${index + 1}</h3>
+                    <p>Principal: ${formatCurrency(principal)}</p>
+                    <p>Interest Rate: ${(rate * 100).toFixed(2)}%</p>
+                    <p>Time: ${time} years</p>
+                    <p>Total Amount: ${formatCurrency(total)}</p>
+                </div>
+            `;
+      });
+      document.getElementById("ic-result").innerHTML = results;
     });
-    if (Math.abs(npvTest) < 0.01) break;
-    irr += npvTest > 0 ? 0.001 : -0.001;
-  }
 
-  const totalReturn = cashFlows.reduce((sum, cf) => sum + cf, 0);
-  const roi = ((totalReturn - initial) / initial) * 100;
-
-  document.getElementById("invResult").innerHTML = `
-        VAN: $${npv.toFixed(2)}<br>
-        TIR: ${(irr * 100).toFixed(2)}%<br>
-        ROI: ${roi.toFixed(2)}%
-    `;
-  playSound("query");
-  playSound("achievement");
-}
-
-function calculateBudget() {
-  playSound("interaction");
-  const income = parseFloat(document.getElementById("budgetIncome").value);
-  const expenses = parseFloat(document.getElementById("budgetExpenses").value);
-
-  if (isNaN(income) || isNaN(expenses)) {
-    playSound("notification");
-    document.getElementById("budgetResult").innerHTML =
-      "Por favor, ingrese valores válidos.";
-    return;
-  }
-
-  const balance = income - expenses;
-  document.getElementById(
-    "budgetResult"
-  ).innerHTML = `Balance: $${balance.toFixed(2)}`;
-  const alert = document.getElementById("budgetAlert");
-  if (expenses > income) {
-    alert.classList.remove("hidden");
-    alert.innerText = "¡Alerta! Tus gastos superan tus ingresos.";
-    playSound("notification");
-  } else {
-    alert.classList.add("hidden");
-  }
-  playSound("query");
-  playSound("achievement");
-}
-
-function calculateMortgage() {
-  playSound("interaction");
-  const amount = parseFloat(document.getElementById("mortgageAmount").value);
-  const rate =
-    parseFloat(document.getElementById("mortgageRate").value) / 100 / 12;
-  const term = parseInt(document.getElementById("mortgageTerm").value) * 12;
-  const costs = parseFloat(document.getElementById("mortgageCosts").value);
-
-  if (isNaN(amount) || isNaN(rate) || isNaN(term) || isNaN(costs)) {
-    playSound("notification");
-    document.getElementById("mortgageResult").innerHTML =
-      "Por favor, ingrese valores válidos.";
-    return;
-  }
-
-  const payment =
-    (amount * (rate * Math.pow(1 + rate, term))) /
-    (Math.pow(1 + rate, term) - 1);
-  const totalCost = payment * term + costs;
-
-  document.getElementById("mortgageResult").innerHTML = `
-        Cuota Mensual: $${payment.toFixed(2)}<br>
-        Costo Total: $${totalCost.toFixed(2)}
-    `;
-  playSound("query");
-  playSound("achievement");
-}
-
-// Mostrar la sección inicial
-showSection("basic");
+  // Emergency Fund
+  document
+    .getElementById("emergency-fund-form")
+    .addEventListener("submit", (e) => {
+      e.preventDefault();
+      const expenses = parseFloat(document.getElementById("ef-expenses").value);
+      const months = parseFloat(document.getElementById("ef-months").value);
+      const fundNeeded = expenses * months;
+      document.getElementById("ef-result").innerHTML = `
+            <p>Emergency Fund Needed: ${formatCurrency(fundNeeded)}</p>
+            <p>(Based on ${months} months of ${formatCurrency(
+        expenses
+      )} monthly expenses)</p>
+        `;
+    });
+});

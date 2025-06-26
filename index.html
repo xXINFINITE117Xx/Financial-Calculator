@@ -1,173 +1,244 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Financiera Gamer</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <title>Financial Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="bg-gray-900 text-white font-sans">
-    <div class="container mx-auto flex flex-col md:flex-row gap-6 p-4 min-h-screen">
-        <div class="sidebar bg-gray-800 p-6 rounded-lg shadow-lg shadow-green-500/50">
-            <h2 class="text-2xl font-bold text-green-400 mb-6 text-center">Banco Gamer</h2>
-            <button onclick="showSection('basic')"
-                class="w-full py-3 mb-2 bg-green-600 hover:bg-green-700 rounded-lg text-lg transition-all duration-300 glow">Cálculos
-                Básicos</button>
-            <button onclick="showSection('loans')"
-                class="w-full py-3 mb-2 bg-green-600 hover:bg-green-700 rounded-lg text-lg transition-all duration-300 glow">Préstamos</button>
-            <button onclick="showSection('investments')"
-                class="w-full py-3 mb-2 bg-green-600 hover:bg-green-700 rounded-lg text-lg transition-all duration-300 glow">Inversiones</button>
-            <button onclick="showSection('budget')"
-                class="w-full py-3 mb-2 bg-green-600 hover:bg-green-700 rounded-lg text-lg transition-all duration-300 glow">Presupuestos</button>
-            <button onclick="showSection('mortgage')"
-                class="w-full py-3 mb-2 bg-green-600 hover:bg-green-700 rounded-lg text-lg transition-all duration-300 glow">Hipotecas</button>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="container mx-auto p-4 max-w-4xl">
+        <h1 class="text-3xl font-bold text-center mb-6">Financial Calculator</h1>
+
+        <!-- Tabs -->
+        <div class="tabs flex flex-wrap border-b mb-4">
+            <button class="tab-btn px-4 py-2 font-semibold text-gray-600 hover:bg-gray-200"
+                data-tab="simple-interest">Simple Interest</button>
+            <button class="tab-btn px-4 py-2 font-semibold text-gray-600 hover:bg-gray-200"
+                data-tab="compound-interest">Compound Interest</button>
+            <button class="tab-btn px-4 py-2 font-semibold text-gray-600 hover:bg-gray-200" data-tab="loan-payment">Loan
+                Payment</button>
+            <button class="tab-btn px-4 py-2 font-semibold text-gray-600 hover:bg-gray-200"
+                data-tab="mortgage">Mortgage</button>
+            <button class="tab-btn px-4 py-2 font-semibold text-gray-600 hover:bg-gray-200"
+                data-tab="savings-goal">Savings Goal</button>
+            <button class="tab-btn px-4 py-2 font-semibold text-gray-600 hover:bg-gray-200"
+                data-tab="budget">Budget</button>
+            <button class="tab-btn px-4 py-2 font-semibold text-gray-600 hover:bg-gray-200"
+                data-tab="investment-compare">Investment Comparison</button>
+            <button class="tab-btn px-4 py-2 font-semibold text-gray-600 hover:bg-gray-200"
+                data-tab="emergency-fund">Emergency Fund</button>
         </div>
-        <div class="content flex-1 bg-gray-800 p-6 rounded-lg shadow-lg shadow-green-500/50">
-            <!-- Cálculos Básicos -->
-            <div id="basic" class="section hidden">
-                <h2 class="text-2xl font-bold text-green-400 mb-4">Cálculos Básicos</h2>
-                <div class="form-group mb-4">
-                    <label class="block mb-2 text-gold">Capital ($):</label>
-                    <input type="number" id="basicCapital" step="0.01"
-                        class="w-full p-2 bg-gray-700 border border-green-500 rounded-lg text-white">
-                </div>
-                <div class="form-group mb-4">
-                    <label class="block mb-2 text-gold">Tasa de Interés (%):</label>
-                    <input type="number" id="basicRate" step="0.01"
-                        class="w-full p-2 bg-gray-700 border border-green-500 rounded-lg text-white">
-                </div>
-                <div class="form-group mb-4">
-                    <label class="block mb-2 text-gold">Tiempo (años):</label>
-                    <input type="number" id="basicTime" step="1"
-                        class="w-full p-2 bg-gray-700 border border-green-500 rounded-lg text-white">
-                </div>
-                <button onclick="calculateBasic()"
-                    class="py-2 px-4 bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-300 glow">Calcular</button>
-                <div class="result mt-4 p-4 bg-gray-900 rounded-lg" id="basicResult"></div>
+
+        <!-- Tab Content -->
+        <div id="tab-content" class="bg-white p-6 rounded-lg shadow-md">
+            <!-- Simple Interest -->
+            <div id="simple-interest" class="tab-panel hidden">
+                <h2 class="text-xl font-semibold mb-4">Simple Interest</h2>
+                <form id="simple-interest-form">
+                    <div class="mb-4">
+                        <label class="block">Principal ($)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="si-principal" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Annual Interest Rate (%)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="si-rate" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Time (years)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="si-time" required>
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Calculate</button>
+                </form>
+                <div id="si-result" class="mt-4"></div>
             </div>
 
-            <!-- Préstamos y Créditos -->
-            <div id="loans" class="section hidden">
-                <h2 class="text-2xl font-bold text-green-400 mb-4">Préstamos y Créditos</h2>
-                <div class="form-group mb-4">
-                    <label class="block mb-2 text-gold">Monto del Préstamo ($):</label>
-                    <input type="number" id="loanAmount" step="0.01"
-                        class="w-full p-2 bg-gray-700 border border-green-500 rounded-lg text-white">
-                </div>
-                <div class="form-group mb-4">
-                    <label class="block mb-2 text-gold">Tasa Anual (%):</label>
-                    <input type="number" id="loanRate" step="0.01"
-                        class="w-full p-2 bg-gray-700 border border-green-500 rounded-lg text-white">
-                </div>
-                <div class="form-group mb-4">
-                    <label class="block mb-2 text-gold">Plazo (meses):</label>
-                    <input type="number" id="loanTerm" step="1"
-                        class="w-full p-2 bg-gray-700 border border-green-500 rounded-lg text-white">
-                </div>
-                <button onclick="calculateLoan()"
-                    class="py-2 px-4 bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-300 glow">Calcular
-                    Cuota</button>
-                <button onclick="exportAmortization('pdf')"
-                    class="py-2 px-4 bg-gold hover:bg-yellow-600 rounded-lg transition-all duration-300 glow">Exportar a
-                    PDF</button>
-                <button onclick="exportAmortization('excel')"
-                    class="py-2 px-4 bg-gold hover:bg-yellow-600 rounded-lg transition-all duration-300 glow">Exportar a
-                    Excel</button>
-                <div class="result mt-4 p-4 bg-gray-900 rounded-lg" id="loanResult"></div>
-                <table id="amortizationTable" class="w-full mt-4 border-collapse">
-                    <thead>
-                        <tr class="bg-green-600 text-white">
-                            <th class="p-2">Período</th>
-                            <th class="p-2">Cuota</th>
-                            <th class="p-2">Interés</th>
-                            <th class="p-2">Capital</th>
-                            <th class="p-2">Saldo</th>
-                        </tr>
-                    </thead>
-                    <tbody id="amortizationBody"></tbody>
-                </table>
+            <!-- Compound Interest -->
+            <div id="compound-interest" class="tab-panel hidden">
+                <h2 class="text-xl font-semibold mb-4">Compound Interest</h2>
+                <form id="compound-interest-form">
+                    <div class="mb-4">
+                        <label class="block">Principal ($)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="ci-principal" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Annual Interest Rate (%)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="ci-rate" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Times Compounded per Year</label>
+                        <input type="number" class="w-full p-2 border rounded" id="ci-compounds" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Time (years)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="ci-time" required>
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Calculate</button>
+                </form>
+                <div id="ci-result" class="mt-4"></div>
             </div>
 
-            <!-- Inversiones -->
-            <div id="investments" class="section hidden">
-                <h2 class="text-2xl font-bold text-green-400 mb-4">Inversiones</h2>
-                <div class="form-group mb-4">
-                    <label class="block mb-2 text-gold">Inversión Inicial ($):</label>
-                    <input type="number" id="invInitial" step="0.01"
-                        class="w-full p-2 bg-gray-700 border border-green-500 rounded-lg text-white">
-                </div>
-                <div class="form-group mb-4">
-                    <label class="block mb-2 text-gold">Flujos de Efectivo (separados por comas):</label>
-                    <input type="text" id="invCashFlows"
-                        class="w-full p-2 bg-gray-700 border border-green-500 rounded-lg text-white">
-                </div>
-                <div class="form-group mb-4">
-                    <label class="block mb-2 text-gold">Tasa de Descuento (%):</label>
-                    <input type="number" id="invRate" step="0.01"
-                        class="w-full p-2 bg-gray-700 border border-green-500 rounded-lg text-white">
-                </div>
-                <button onclick="calculateInvestments()"
-                    class="py-2 px-4 bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-300 glow">Calcular</button>
-                <div class="result mt-4 p-4 bg-gray-900 rounded-lg" id="invResult"></div>
+            <!-- Loan Payment -->
+            <div id="loan-payment" class="tab-panel hidden">
+                <h2 class="text-xl font-semibold mb-4">Loan Payment</h2>
+                <form id="loan-payment-form">
+                    <div class="mb-4">
+                        <label class="block">Loan Amount ($)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="loan-principal" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Monthly Interest Rate (%)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="loan-rate" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Number of Payments</label>
+                        <input type="number" class="w-full p-2 border rounded" id="loan-payments" required>
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Calculate</button>
+                </form>
+                <div id="loan-result" class="mt-4"></div>
             </div>
 
-            <!-- Presupuestos -->
-            <div id="budget" class="section hidden">
-                <h2 class="text-2xl font-bold text-green-400 mb-4">Presupuestos</h2>
-                <div class="form-group mb-4">
-                    <label class="block mb-2 text-gold">Ingresos Mensuales ($):</label>
-                    <input type="number" id="budgetIncome" step="0.01"
-                        class="w-full p-2 bg-gray-700 border border-green-500 rounded-lg text-white">
-                </div>
-                <div class="form-group mb-4">
-                    <label class="block mb-2 text-gold">Gastos Mensuales ($):</label>
-                    <input type="number" id="budgetExpenses" step="0.01"
-                        class="w-full p-2 bg-gray-700 border border-green-500 rounded-lg text-white">
-                </div>
-                <button onclick="calculateBudget()"
-                    class="py-2 px-4 bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-300 glow">Calcular</button>
-                <div class="result mt-4 p-4 bg-gray-900 rounded-lg" id="budgetResult"></div>
-                <div class="alert mt-4 p-4 bg-red-600 rounded-lg hidden" id="budgetAlert"></div>
+            <!-- Mortgage Calculator -->
+            <div id="mortgage" class="tab-panel hidden">
+                <h2 class="text-xl font-semibold mb-4">Mortgage Calculator</h2>
+                <form id="mortgage-form">
+                    <div class="mb-4">
+                        <label class="block">Loan Amount ($)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="mortgage-principal"
+                            required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Annual Interest Rate (%)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="mortgage-rate" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Loan Term (years)</label>
+                        <input type="number" class="w-full p-2 border rounded" id="mortgage-term" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Monthly Income ($)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="mortgage-income"
+                            required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Max Payment (% of Income)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="mortgage-max-percent"
+                            value="30" required>
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Calculate</button>
+                </form>
+                <div id="mortgage-result" class="mt-4"></div>
             </div>
 
-            <!-- Hipotecas -->
-            <div id="mortgage" class="section hidden">
-                <h2 class="text-2xl font-bold text-green-400 mb-4">Calculadora Hipotecaria</h2>
-                <div class="form-group mb-4">
-                    <label class="block mb-2 text-gold">Monto del Préstamo ($):</label>
-                    <input type="number" id="mortgageAmount" step="0.01"
-                        class="w-full p-2 bg-gray-700 border border-green-500 rounded-lg text-white">
-                </div>
-                <div class="form-group mb-4">
-                    <label class="block mb-2 text-gold">Tasa Anual (%):</label>
-                    <input type="number" id="mortgageRate" step="0.01"
-                        class="w-full p-2 bg-gray-700 border border-green-500 rounded-lg text-white">
-                </div>
-                <div class="form-group mb-4">
-                    <label class="block mb-2 text-gold">Plazo (años):</label>
-                    <input type="number" id="mortgageTerm" step="1"
-                        class="w-full p-2 bg-gray-700 border border-green-500 rounded-lg text-white">
-                </div>
-                <div class="form-group mb-4">
-                    <label class="block mb-2 text-gold">Costos Asociados ($):</label>
-                    <input type="number" id="mortgageCosts" step="0.01"
-                        class="w-full p-2 bg-gray-700 border border-green-500 rounded-lg text-white">
-                </div>
-                <button onclick="calculateMortgage()"
-                    class="py-2 px-4 bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-300 glow">Calcular</button>
-                <div class="result mt-4 p-4 bg-gray-900 rounded-lg" id="mortgageResult"></div>
+            <!-- Savings Goal -->
+            <div id="savings-goal" class="tab-panel hidden">
+                <h2 class="text-xl font-semibold mb-4">Savings Goal</h2>
+                <form id="savings-goal-form">
+                    <div class="mb-4">
+                        <label class="block">Savings Goal ($)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="savings-goal-amount"
+                            required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Current Savings ($)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="savings-current"
+                            required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Months to Reach Goal</label>
+                        <input type="number" class="w-full p-2 border rounded" id="savings-months" required>
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Calculate</button>
+                </form>
+                <div id="savings-result" class="mt-4"></div>
+            </div>
+
+            <!-- Budget Planner -->
+            <div id="budget" class="tab-panel hidden">
+                <h2 class="text-xl font-semibold mb-4">Budget Planner</h2>
+                <form id="budget-form">
+                    <div class="mb-4">
+                        <label class="block">Monthly Income ($)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="budget-income" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Food ($)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="budget-food" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Transportation ($)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="budget-transport"
+                            required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Utilities ($)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="budget-utilities"
+                            required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Other ($)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="budget-other" required>
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Calculate</button>
+                </form>
+                <div id="budget-result" class="mt-4"></div>
+                <canvas id="budget-chart" class="mt-4"></canvas>
+            </div>
+
+            <!-- Investment Comparison -->
+            <div id="investment-compare" class="tab-panel hidden">
+                <h2 class="text-xl font-semibold mb-4">Investment Comparison</h2>
+                <form id="investment-compare-form">
+                    <div id="investment-scenarios">
+                        <div class="scenario mb-4 border p-4 rounded">
+                            <h3 class="font-semibold">Scenario 1</h3>
+                            <div class="mb-2">
+                                <label class="block">Principal ($)</label>
+                                <input type="number" step="0.01" class="w-full p-2 border rounded" name="ic-principal"
+                                    required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="block">Annual Interest Rate (%)</label>
+                                <input type="number" step="0.01" class="w-full p-2 border rounded" name="ic-rate"
+                                    required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="block">Time (years)</label>
+                                <input type="number" step="0.01" class="w-full p-2 border rounded" name="ic-time"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" id="add-scenario" class="bg-green-500 text-white px-4 py-2 rounded mb-4">Add
+                        Scenario</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Compare</button>
+                </form>
+                <div id="ic-result" class="mt-4"></div>
+            </div>
+
+            <!-- Emergency Fund -->
+            <div id="emergency-fund" class="tab-panel hidden">
+                <h2 class="text-xl font-semibold mb-4">Emergency Fund Simulator</h2>
+                <form id="emergency-fund-form">
+                    <div class="mb-4">
+                        <label class="block">Monthly Expenses ($)</label>
+                        <input type="number" step="0.01" class="w-full p-2 border rounded" id="ef-expenses" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block">Desired Months of Coverage</label>
+                        <input type="number" class="w-full p-2 border rounded" id="ef-months" value="6" required>
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Calculate</button>
+                </form>
+                <div id="ef-result" class="mt-4"></div>
             </div>
         </div>
     </div>
-    <audio id="notificationSound" src="sounds/NotificationSound.mp3"></audio>
-    <audio id="interactionSound" src="sounds/ClickSound.mp3"></audio>
-    <audio id="achievementSound" src="sounds/achievementSound.mp3"></audio>
-    <audio id="querySound" src="sounds/ThemeSound.mp3"></audio>
     <script src="script.js"></script>
 </body>
 

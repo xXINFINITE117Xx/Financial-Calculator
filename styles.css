@@ -1,270 +1,157 @@
-@font-face {
-    font-family: 'Orbitron';
-    src: url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-}
-
 body {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+    color: #e0e0e0;
     font-family: 'Orbitron', sans-serif;
-    background: linear-gradient(135deg, #1a202c, #2d3748);
-}
-
-.glow {
-    box-shadow: 0 0 10px rgba(34, 197, 94, 0.7), 0 0 20px rgba(34, 197, 94, 0.5);
-    transition: box-shadow 0.3s ease;
-}
-
-.glow:hover {
-    box-shadow: 0 0 20px rgba(34, 197, 94, 1), 0 0 30px rgba(34, 197, 94, 0.7);
-}
-
-.text-gold {
-    color: #f1c40f;
-}
-
-table th,
-table td {
-    border: 1px solid #22c55e;
-    padding: 8px;
-    text-align: right;
-}
-
-table th {
-    background: #22c55e;
-}
-
-/* Tailwind CSS compilado (subset de clases usadas) */
-.bg-gray-900 {
-    background-color: #111827;
-}
-
-.text-white {
-    color: #ffffff;
-}
-
-.font-sans {
-    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-}
-
-.mx-auto {
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.flex {
-    display: flex;
-}
-
-.flex-col {
-    flex-direction: column;
-}
-
-.md\:flex-row {
-    @media (min-width: 768px) {
-        flex-direction: row;
-    }
-}
-
-.gap-6 {
-    gap: 1.5rem;
-}
-
-.p-4 {
-    padding: 1rem;
-}
-
-.min-h-screen {
     min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
 }
 
-.bg-gray-800 {
-    background-color: #1f2937;
-}
-
-.p-6 {
-    padding: 1.5rem;
-}
-
-.rounded-lg {
-    border-radius: 0.5rem;
-}
-
-.shadow-lg {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-.shadow-green-500\/50 {
-    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
-}
-
-.text-2xl {
-    font-size: 1.5rem;
-    line-height: 2rem;
-}
-
-.font-bold {
-    font-weight: 700;
-}
-
-.text-green-400 {
-    color: #4ade80;
-}
-
-.mb-6 {
-    margin-bottom: 1.5rem;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.w-full {
+.container {
+    background: rgba(0, 0, 0, 0.85);
+    border: 2px solid #00ff99;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 0 20px rgba(0, 255, 153, 0.5), inset 0 0 10px rgba(0, 255, 153, 0.3);
+    max-width: 900px;
     width: 100%;
 }
 
-.py-3 {
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
+h1 {
+    color: #ffd700;
+    text-shadow: 0 0 10px #ffd700, 0 0 20px #00ff99;
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    animation: neon-flicker 2s infinite alternate;
 }
 
-.mb-2 {
-    margin-bottom: 0.5rem;
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 2px solid #00ff99;
 }
 
-.bg-green-600 {
-    background-color: #16a34a;
+.tab-btn {
+    background: #2c2c2c;
+    color: #e0e0e0;
+    padding: 0.75rem 1.5rem;
+    margin-right: 0.5rem;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid #00ff99;
+    text-transform: uppercase;
+    font-size: 0.9rem;
 }
 
-.hover\:bg-green-700:hover {
-    background-color: #15803d;
+.tab-btn:hover,
+.tab-btn.active {
+    background: #00ff99;
+    color: #1a1a1a;
+    box-shadow: 0 0 15px #00ff99;
 }
 
-.text-lg {
-    font-size: 1.125rem;
-    line-height: 1.75rem;
-}
-
-.transition-all {
-    transition-property: all;
-}
-
-.duration-300 {
-    transition-duration: 300ms;
-}
-
-.flex-1 {
-    flex: 1 1 0%;
-}
-
-.hidden {
+.tab-panel {
     display: none;
+    padding: 1.5rem;
+    background: rgba(20, 20, 20, 0.9);
+    border-radius: 0 0 10px 10px;
+    border: 1px solid #00ff99;
 }
 
-.mb-4 {
-    margin-bottom: 1rem;
-}
-
-.block {
+.tab-panel.active {
     display: block;
 }
 
-.p-2 {
+h2 {
+    color: #ffd700;
+    text-shadow: 0 0 5px #ffd700;
+    margin-bottom: 1rem;
+}
+
+form {
+    display: grid;
+    gap: 1rem;
+}
+
+label {
+    color: #00ff99;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+input {
+    background: #1a1a1a;
+    border: 1px solid #00ff99;
+    color: #e0e0e0;
     padding: 0.5rem;
+    border-radius: 5px;
+    transition: all 0.3s ease;
 }
 
-.bg-gray-700 {
-    background-color: #374151;
+input:focus {
+    outline: none;
+    box-shadow: 0 0 10px #00ff99;
 }
 
-.border {
-    border-width: 1px;
+button {
+    background: #ffd700;
+    color: #1a1a1a;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
 }
 
-.border-green-500 {
-    border-color: #22c55e;
+button:hover {
+    background: #00ff99;
+    box-shadow: 0 0 15px #00ff99;
 }
 
-.py-2 {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+#budget-chart {
+    max-width: 400px;
+    margin: 1rem auto;
 }
 
-.px-4 {
-    padding-left: 1rem;
-    padding-right: 1rem;
+#ic-result {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
 }
 
-.mt-4 {
-    margin-top: 1rem;
+.scenario {
+    background: rgba(0, 255, 153, 0.1);
+    border: 1px solid #00ff99;
+    border-radius: 8px;
 }
 
-.bg-red-600 {
-    background-color: #dc3545;
+@keyframes neon-flicker {
+    0% {
+        text-shadow: 0 0 5px #ffd700, 0 0 10px #00ff99;
+    }
+
+    50% {
+        text-shadow: 0 0 10px #ffd700, 0 0 20px #00ff99;
+    }
+
+    100% {
+        text-shadow: 0 0 5px #ffd700, 0 0 15px #00ff99;
+    }
 }
 
-.bg-gold {
-    background-color: #f1c40f;
-}
-
-.hover:bg-yellow-600:hover {
-    background-color: #d97706;
-}
-
-.border-collapse {
-    border-collapse: collapse;
-}
-
-@media (min-width: 200px) {
+@media (max-width: 640px) {
     .container {
-        padding: 12px;
+        padding: 1rem;
     }
 
-    .sidebar {
-        width: 100%;
-        max-width: 320px;
-    }
-
-    .content {
-        padding: 12px;
-    }
-
-    .form-group input {
-        font-size: 14px;
-    }
-
-    button {
-        font-size: 14px;
-    }
-}
-
-@media (min-width: 600px) {
-    .container {
-        flex-direction: row;
-        max-width: 1000px;
-    }
-
-    .sidebar {
-        width: 250px;
-    }
-
-    .content {
-        max-width: 800px;
-    }
-
-    .form-group input {
-        font-size: 16px;
-    }
-
-    button {
-        font-size: 16px;
-    }
-}
-
-@media (min-width: 1024px) {
-    .container {
-        max-width: 1200px;
-    }
-
-    .sidebar {
-        width: 300px;
+    .tab-btn {
+        flex: 1 1 100%;
+        margin-bottom: 0.5rem;
     }
 }
